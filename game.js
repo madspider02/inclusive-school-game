@@ -467,6 +467,7 @@
         <div class="big-name">黃老師</div>
         <div>職務：五年二班導師</div>
         <div>到職日：今天</div>
+        <div class="subtle designer-credit">設計者：國教院黃彥融副研究員</div>
       </div>
       <div class="card-note center"><strong>今日任務</strong><br>平安度過第一天（？）</div>
       <p class="center">你修過教育法規。你學過特殊教育。你知道什麼是融合教育。</p>

@@ -263,3 +263,9 @@ h1 {
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition: none !important; }
 }
+
+
+.designer-credit {
+  margin-top: 0.45rem;
+  font-size: 0.95rem;
+}
