@@ -1,0 +1,678 @@
+(() => {
+  'use strict';
+
+  const titleEl = document.getElementById('screen-title');
+  const timeEl = document.getElementById('time-pill');
+  const progressEl = document.getElementById('progress-bar');
+  const sceneEl = document.getElementById('scene');
+  const storyEl = document.getElementById('story');
+  const actionsEl = document.getElementById('actions');
+
+  const initialTraits = () => ({
+    rights: 0,
+    individual: 0,
+    voice: 0,
+    accommodation: 0,
+    collaboration: 0,
+    procedure: 0,
+    care: 0,
+    same: 0,
+    delegate: 0,
+    solo: 0
+  });
+
+  const state = {
+    phase: 'cover',
+    step: 0,
+    answers: {},
+    traits: initialTraits()
+  };
+
+  const scenes = [
+    {
+      id: 'q1',
+      time: '07:40',
+      icon: '📚',
+      art: 'classroom',
+      title: '第一關｜新班級裡的「特殊生」',
+      story: `
+        <p>資源班陳老師從門口探頭。</p>
+        <div class="quote">「黃老師，小彥是自閉症學生，有接受資源班服務。他的 IEP 裡有一些需要注意的地方。像是臨時改變活動時，他有時候會比較不安；上課如果資訊很多，也可能需要多一點時間。」</div>
+        <p>「快打鐘了，我中午再過來跟你說詳細一點。」</p>
+        <p>你看向教室裡的小彥。他正在看黑板上的今日課表。</p>
+        <div class="callout"><strong>身為他的導師，你現在最適合怎麼做？</strong></div>
+      `,
+      options: [
+        {
+          title: '先掌握障礙特徵',
+          text: '「我大學有學過自閉症，先按照常見特徵注意他的狀況，有問題再調整。」',
+          delta: { procedure: 1 },
+          result: '你開始回想課堂裡學過的自閉症特徵。至少，你不是毫無準備。',
+          reflect: '但「自閉症學生」和眼前的「小彥」，會完全一樣嗎？'
+        },
+        {
+          title: '先把 IEP 弄清楚',
+          text: '「先看小彥的 IEP，確認需求與支持方式，再依照 IEP 協助。」',
+          delta: { procedure: 2, individual: 1 },
+          result: '你在記事本上寫下：中午先把小彥的 IEP 看完。',
+          reflect: 'IEP 很重要，但它是學生的「使用說明書」，還是認識學生的起點？'
+        },
+        {
+          title: '先認識小彥',
+          text: '「IEP 要看，我也想直接了解他會什麼、需要什麼，以及他自己怎麼想。」',
+          delta: { individual: 2, voice: 2, rights: 1 },
+          result: '你告訴小彥：「如果有什麼事情需要我知道，可以直接跟我說。」他看著你問：「什麼都可以說嗎？」',
+          reflect: '小彥不只是 IEP 裡被描述的學生。'
+        },
+        {
+          title: '專業的事交給專業的人',
+          text: '「我負責班級教學；特殊教育有資源班老師，有需要再配合就好。」',
+          delta: { delegate: 3 },
+          result: '你決定有需要時再找陳老師。畢竟，他才是特教老師。',
+          reflect: '只是今天的事情，未必都會等到陳老師在場。'
+        }
+      ]
+    },
+    {
+      id: 'q2',
+      time: '08:40',
+      icon: '✏️',
+      art: 'math',
+      title: '第二關｜老師，為什麼他可以？',
+      story: `
+        <p>數學課進行到一半，小彥看得懂題目，卻需要比較長的時間閱讀。你讓他多一些時間。</p>
+        <div class="quote">阿哲：「黃老師，為什麼小彥可以多一點時間？我寫不完也可以嗎？」</div>
+        <p>小彥把鉛筆放下。全班都看著你。</p>
+      `,
+      options: [
+        {
+          title: '規則就是規則',
+          text: '「小彥是特殊教育學生，本來就可以有一些特別的調整。」',
+          delta: { procedure: 1 },
+          result: '幾個孩子點點頭：「喔，因為他是特殊生。」',
+          reflect: '你解釋了調整，卻也可能留下「因為他是特殊生」的標籤。'
+        },
+        {
+          title: '公平就是每個人都可以',
+          text: '「好，那今天只要寫不完的人，都可以多五分鐘。」',
+          delta: { same: 3 },
+          result: '阿哲很開心。但你發現，小彥需要處理的困難並不只是「時間」。',
+          reflect: '每個人得到一模一樣的東西，就一定公平嗎？'
+        },
+        {
+          title: '把焦點放回每個人的學習需要',
+          text: '「公平不一定是完全一樣，而是讓每個人都有機會把自己會的表現出來。」',
+          delta: { rights: 2, individual: 2, accommodation: 1 },
+          result: '阿哲皺眉：「所以不是讓他比較簡單？」你回答：「這就是我們要一起想清楚的地方。」',
+          reflect: '五年二班第一次開始討論：公平是不是等於一樣。'
+        },
+        {
+          title: '不要公開談他的事情',
+          text: '「這是老師跟小彥之間的事情，我們不適合在全班面前討論。」',
+          delta: { rights: 1, procedure: 1 },
+          result: '你保護了小彥的個人資訊，但同學對差異支持仍然困惑。',
+          reflect: '保護隱私與回應同學的公平疑問，能不能同時做到？'
+        }
+      ]
+    },
+    {
+      id: 'q3',
+      time: '10:10',
+      icon: '🔬',
+      art: 'science',
+      title: '第三關｜我們這組不要小彥！',
+      story: `
+        <p>自然課分組前，佳佳小聲說：</p>
+        <div class="quote">「我們這組……可以不要跟小彥一組嗎？」</div>
+        <p>阿哲：「因為他都不跟我們討論啊！上次做海報，我們只是把標題換一個顏色，他就一直說不行。」</p>
+        <p>佳佳趕緊補一句：「我們不是討厭他喔……可是跟他一組真的很累。」</p>
+      `,
+      options: [
+        {
+          title: '融合就是大家都要一起',
+          text: '「小彥也是班上的一份子，不能排斥他。照原本分組。」',
+          delta: { rights: 1 },
+          result: '小彥留在原組，但實驗很快又出現爭執。',
+          reflect: '「在同一組」和「真正參與」是同一件事嗎？'
+        },
+        {
+          title: '先讓大家完成今天的實驗',
+          text: '「今天先幫小彥換一組，讓大家順利完成，之後再處理。」',
+          delta: { care: 1 },
+          result: '實驗順利了，但你突然想起：上次被換組的，好像也是小彥。',
+          reflect: '每次都是合理的臨時處理，可是被移動的為什麼總是他？'
+        },
+        {
+          title: '先弄清楚「麻煩」到底是什麼',
+          text: '先問同學發生了什麼，也問小彥怎麼看，再找具體的合作支持。',
+          delta: { individual: 2, voice: 2, rights: 1 },
+          result: '「一定要照順序」「突然改東西會不安」「有時很久才回答」——模糊的「麻煩」開始變成可以處理的情境。',
+          reflect: '真正需要改變的是小彥，還是活動的方式？'
+        },
+        {
+          title: '讓小彥自己選',
+          text: '「等一下我問他想跟哪一組，再讓他自己選。」',
+          delta: { voice: 2 },
+          result: '小彥仍然選原組：「佳佳知道我怎麼記實驗步驟。」',
+          reflect: '尊重選擇很好，但老師的支持責任就結束了嗎？'
+        }
+      ]
+    },
+    {
+      id: 'q4',
+      time: '11:20',
+      icon: '📝',
+      art: 'math',
+      title: '第四關｜這張考卷，他也要寫一樣的嗎？',
+      story: `
+        <p>今天的小考要評量「兩步驟應用問題」，文字很多。</p>
+        <div class="quote">另一位老師：「小彥真的要寫這份？他不是有去資源班嗎？不然幫他改簡單一點，這樣比較有成就感。」</div>
+        <p>你知道：「需要比較多時間」和「不會這個內容」，好像不是同一件事。</p>
+      `,
+      options: [
+        {
+          title: '既然有評量調整，就降低題目難度',
+          text: '把兩步驟題改成一步驟，題數也少一點。',
+          delta: { care: 3 },
+          result: '小彥很快寫完，卻問：「為什麼我的題目跟阿哲不一樣？」',
+          reflect: '支持學生，有沒有可能同時降低了原本對他的期待？'
+        },
+        {
+          title: '公平起見，大家寫同一份',
+          text: '同一份考卷、同一個時間，這樣最公平。',
+          delta: { same: 3 },
+          result: '鐘響時，小彥還有兩題沒寫完；你看見他已完成的算式其實是對的。',
+          reflect: '相同規則真的測到了相同能力嗎？'
+        },
+        {
+          title: '先確認這次到底要評量什麼',
+          text: '保留兩步驟目標，調整文字呈現、標示重點並提供需要的時間。',
+          delta: { accommodation: 3, individual: 2, rights: 1 },
+          result: '小彥完成了兩步驟計算。原來他會。',
+          reflect: '調整不一定是讓學習變簡單；也可能是移除妨礙學生表現能力的障礙。'
+        },
+        {
+          title: '既然有 IEP，就完全照 IEP 辦',
+          text: 'IEP 寫什麼支持，就完全照文件提供。',
+          delta: { procedure: 3 },
+          result: '評量順利完成，但你突然想到：這份 IEP 是幾個月前訂定的。',
+          reflect: 'IEP 能不能取代教師此刻對學生需求的觀察與判斷？'
+        }
+      ]
+    },
+    {
+      id: 'q5',
+      time: '12:30',
+      icon: '🚌',
+      art: 'trip',
+      title: '第五關｜媽媽說：「不然就不要去了。」',
+      story: `
+        <p>下個月要去自然科學博物館。小彥媽媽擔心去年戶外教育時臨時改行程、人又多，讓小彥非常不安，希望今年能陪同；如果不方便，也可以讓小彥留校。</p>
+        <p>你問小彥：「你想去嗎？」</p>
+        <div class="quote"><strong>「……想。我會怕，可是我還是想去。」</strong></div>
+        <p>「因為全班都會去啊。而且我想看恐龍。我只是不喜歡不知道下一個要去哪裡。」</p>
+      `,
+      options: [
+        {
+          title: '尊重家長的判斷',
+          text: '如果媽媽擔心，就安排小彥當天留校。',
+          delta: { care: 2 },
+          result: '小彥問：「阿哲跟佳佳都會去嗎？」然後一直看著通知單上的恐龍。',
+          reflect: '你尊重了家長的擔心，有沒有同樣認真地對待小彥的意願？'
+        },
+        {
+          title: '校外教學大家都一樣',
+          text: '既然要去，就跟全班照原行程參加，不做特別安排。',
+          delta: { same: 2, rights: 1 },
+          result: '你保障了「可以去」，卻還沒有處理究竟是什麼讓參與特別困難。',
+          reflect: '參加活動與能夠實質參與，可能不是同一件事。'
+        },
+        {
+          title: '先找出他參與時真正遇到的障礙',
+          text: '和小彥、家長、資源班老師確認去年的困難，再討論支持。',
+          delta: { accommodation: 3, voice: 2, collaboration: 2, individual: 2 },
+          result: '需求開始變得具體：提前知道流程、變動時先通知、人潮太多時能短暫離開、知道找誰協助。小彥還問：「可以告訴我恐龍在哪一樓嗎？」',
+          reflect: '有沒有可能先改變環境，而不是先改變小彥能不能參加？'
+        },
+        {
+          title: '媽媽陪同最保險',
+          text: '如果媽媽願意，就請她陪同，大家都比較安心。',
+          delta: { care: 2 },
+          result: '小彥問：「如果媽媽沒有去，我就不能去嗎？」',
+          reflect: '家長陪同可以是一種支持，但它是否真的有必要成為參加條件？'
+        }
+      ]
+    },
+    {
+      id: 'q6',
+      time: '13:30',
+      icon: '🏃',
+      art: 'sport',
+      title: '第六關｜安全起見，他今天不要跑？',
+      story: `
+        <p>體育課要進行接力。林老師說，上次有人突然大聲喊叫，小彥在跑道上停住，今天又人多、又計時。</p>
+        <div class="quote">「安全起見，不然今天讓他幫忙記成績？一樣有參與，而且比較不會出事。」</div>
+        <p>你轉頭，小彥已經拿著接力棒問阿哲：「我是第三棒對不對？」</p>
+      `,
+      options: [
+        {
+          title: '安全還是最重要',
+          text: '今天先不要跑，讓小彥改做記錄工作。',
+          delta: { care: 2 },
+          result: '小彥坐在終點記秒數。他在體育課裡，也有一個任務。',
+          reflect: '「有一個任務」就是「參與原本的學習活動」嗎？'
+        },
+        {
+          title: '既然要融合，就讓他跟大家一樣跑',
+          text: '既然他想跑，就照原本棒次，不做特別處理。',
+          delta: { rights: 1, same: 1 },
+          result: '旁邊突然一陣歡呼，小彥停頓，後面的同學差點撞上來。',
+          reflect: '不要排除學生，不等於什麼支持都不用做。'
+        },
+        {
+          title: '先確認風險，再找支持方法',
+          text: '了解上次發生什麼，也問小彥，再調整提示、動線或約定訊號。',
+          delta: { accommodation: 3, voice: 2, individual: 2, collaboration: 1 },
+          result: '你們發現問題主要是突然聲音與不清楚是否該停。阿哲在旁邊補一句：「他跑很快耶！」',
+          reflect: '今天第一次，有人談到的不是小彥的困難，而是他的能力。'
+        },
+        {
+          title: '讓小彥自己決定',
+          text: '只要他說想跑，就尊重他的決定。',
+          delta: { voice: 3 },
+          result: '小彥說想跑。林老師卻問你：「那上次的風險要怎麼處理？」',
+          reflect: '學生表意，不代表把成人的支持責任全部交還給學生。'
+        }
+      ]
+    },
+    {
+      id: 'q7',
+      time: '14:50',
+      icon: '💬',
+      art: 'talk',
+      title: '第七關｜老師，可是我不想要這樣',
+      story: '',
+      options: [
+        {
+          title: '先讓他知道老師是為他好',
+          text: '「大家都是因為擔心你、希望你好，才會做這些決定。」',
+          delta: { care: 2 },
+          result: '你的理由都是真的。但小彥安靜了下來。',
+          reflect: '「為你好」能不能取代學生自己的聲音？'
+        },
+        {
+          title: '以後都讓小彥自己決定',
+          text: '「以後只要是你的事情，最後就按照你的決定來做。」',
+          delta: { voice: 3 },
+          result: '小彥反而說：「可是有時候我也不知道要怎麼選。」',
+          reflect: '表意權不等於所有事情都由學生單獨決定。'
+        },
+        {
+          title: '先聽，再一起重新看今天的決定',
+          text: '你說你的想法，我也說老師擔心什麼，我們一起想辦法。',
+          delta: { voice: 3, rights: 2, individual: 2, accommodation: 1 },
+          result: '你們重新看了今天幾件事。你也承認，有些決定做得太快。',
+          reflect: '讓學生的意見真正進入決策，同時保留教師的專業支持責任。'
+        },
+        {
+          title: '把他的意見記下來，之後和大人討論',
+          text: '把小彥的想法帶回家長、特教老師與其他教師的討論。',
+          delta: { collaboration: 2, procedure: 1 },
+          result: '你認真記錄了小彥的想法。只是他問：「那你們討論的時候，我呢？」',
+          reflect: '聽過學生的意見，和讓他的聲音真正進入決策，是同一件事嗎？'
+        }
+      ]
+    },
+    {
+      id: 'q8',
+      time: '16:10',
+      icon: '🌇',
+      art: 'office',
+      title: '第八關｜放學了，但事情還沒結束',
+      story: `
+        <p>孩子都走了。桌上留下小彥的 IEP、數學小考、校外教學通知單。</p>
+        <p>陳老師走進來：</p>
+        <div class="quote">「第一天還活著嗎？」</div>
+        <p>你沉默三秒：「……我有很多事情想問你。」</p>
+        <p>談完今天所有事情，你才發現：很多支持都是事情發生後才臨時決定。</p>
+        <div class="callout"><strong>明天、下星期、下個月呢？</strong></div>
+      `,
+      options: [
+        {
+          title: '我要再多學一點，自己準備好',
+          text: '把 IEP、法規與相關資料讀熟，至少下次我可以自己判斷。',
+          delta: { solo: 3, procedure: 1 },
+          result: '晚上 10:47，你還在搜尋：「自閉症學生校外教學支持」、「體育課融合教育支持」……你真的變得更懂了。',
+          reflect: '但如果整個支持系統只存在黃老師的腦袋裡，一個很努力的老師可以撐多久？'
+        },
+        {
+          title: '以後多請陳老師協助',
+          text: '跟小彥有關的事情，先問資源班老師再決定。',
+          delta: { delegate: 3, collaboration: 1 },
+          result: '陳老師說：「可以啊。可是我星期三下午不在，而且體育課我也不會跟著去。」',
+          reflect: '小彥一天大部分的時間，其實都在五年二班。'
+        },
+        {
+          title: '把今天的問題變成大家一起準備的事情',
+          text: '找小彥、家長、資源班、任課教師與需要的行政人員，先談支持與分工。',
+          delta: { collaboration: 4, rights: 1, voice: 1, accommodation: 1 },
+          result: '你們不再寫「小彥有哪些問題」，而是寫：「哪些情境形成障礙？可以有哪些支持？誰需要知道？誰一起做？」',
+          reflect: '有些事情，本來就不應該由一個老師自己扛。'
+        },
+        {
+          title: '先把 IEP 修得更完整',
+          text: '把評量、活動參與、情緒支持與注意事項都先寫清楚。',
+          delta: { procedure: 3 },
+          result: '你寫到一半突然停下來：如果下一次遇到的是 IEP 裡從來沒有寫過的情境呢？',
+          reflect: 'IEP 很重要，但它不是一本能預先寫完所有答案的學生使用說明書。'
+        }
+      ]
+    }
+  ];
+
+  const endingData = {
+    aware: {
+      icon: '🌱',
+      title: '具有法規意識的融合教師',
+      body: '你不一定每一次都知道答案。但遇到問題時，你開始會問：學生遇到什麼障礙？他怎麼想？我們能調整什麼？誰可以一起協助？',
+      quote: '「黃老師，恐龍在二樓。」「你查到了？」「我早就查到了。我只是想確認你會不會記得。」'
+    },
+    care: {
+      icon: '❤️',
+      title: '善意滿滿的照顧型教師',
+      body: '你一直努力想「怎麼做對小彥最好」。只是有時候，你比小彥更快替他決定了什麼對他最好。',
+      quote: '「黃老師，你不用每次都幫我。我不會的時候會跟你說。」'
+    },
+    procedure: {
+      icon: '📋',
+      title: '照表操課的法規型教師',
+      body: '你知道專業決定需要依據，這是很好的基礎。但文件記錄的是學生的需要，不能完全取代眼前這個學生。',
+      quote: '小彥看著自己的 IEP 問：「黃老師，這裡面都是我嗎？」'
+    },
+    solo: {
+      icon: '🔥',
+      title: '一個人扛下所有事情的熱血教師',
+      body: '你願意為學生多做一點。但如果融合教育只能靠一位老師不斷「多做一點」，那可能不是一個能長久運作的支持系統。',
+      quote: '陳老師傳訊息：「你還在工作？」你回：「快好了。……應該。」'
+    },
+    delegate: {
+      icon: '🧑‍🏫',
+      title: '把特教交給特教的老師',
+      body: '你知道合作的重要，也習慣尋求特教專業。但小彥一天大部分的時間，並不在資源班。',
+      quote: '「黃老師，你明天還是我的老師嗎？」「當然啊。」「那就好。」'
+    },
+    same: {
+      icon: '⚖️',
+      title: '「我對每個人都一樣」的公平教師',
+      body: '你很在意不偏心，因此盡可能讓所有人遵守相同規則。但當每個人的障礙不同，「完全一樣」一定能帶來公平嗎？',
+      quote: '「如果我看題目真的比較久，我一定要跟阿哲一樣快，才算公平嗎？」'
+    },
+    secret: {
+      icon: '🔓',
+      title: '隱藏結局｜「可以再商量老師」',
+      body: '你今天並不是每一次都做出最理想的決定。但當小彥告訴你他的感受，你願意重新聽、重新想，也願意修正。',
+      quote: '隔天桌上有張紙條：「昨天有一些事情我不喜歡。但是你後來有問我。所以今天如果有事情，我們可以再商量。——小彥」'
+    }
+  };
+
+  function addTraits(delta) {
+    Object.entries(delta || {}).forEach(([key, value]) => {
+      state.traits[key] = (state.traits[key] || 0) + value;
+    });
+  }
+
+  function setProgress(value) {
+    progressEl.style.width = `${Math.max(0, Math.min(100, value))}%`;
+  }
+
+  function renderSceneArt(kind, icon, caption) {
+    sceneEl.className = `scene scene-${kind}`;
+    sceneEl.innerHTML = `
+      <div class="scene-generic">
+        <div class="scene-icon">${icon}</div>
+        <div class="school-badge">國教院附小</div>
+        <div class="scene-caption">${caption}</div>
+      </div>`;
+  }
+
+  function clearActions() {
+    actionsEl.innerHTML = '';
+  }
+
+  function addButton(label, className, handler) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = className;
+    button.textContent = label;
+    button.addEventListener('click', handler);
+    actionsEl.appendChild(button);
+  }
+
+  function showCover() {
+    state.phase = 'cover';
+    titleEl.textContent = '新手老師大作戰';
+    timeEl.textContent = '報到日';
+    setProgress(3);
+    sceneEl.className = 'scene';
+    sceneEl.innerHTML = `
+      <div class="scene-cover">
+        <div class="school-badge">國教院附小</div>
+        <div class="school-emoji">🏫</div>
+        <div class="scene-caption">五年二班・黃老師報到</div>
+      </div>`;
+
+    storyEl.innerHTML = `
+      <div class="center">
+        <div class="subtle">國教院附小｜教師識別證</div>
+        <div class="big-name">黃老師</div>
+        <div>職務：五年二班導師</div>
+        <div>到職日：今天</div>
+      </div>
+      <div class="card-note center"><strong>今日任務</strong><br>平安度過第一天（？）</div>
+      <p class="center">你修過教育法規。你學過特殊教育。你知道什麼是融合教育。</p>
+      <p class="center"><strong>但是今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>`;
+
+    clearActions();
+    addButton('打卡上班 →', 'primary', showPrologue);
+  }
+
+  function showPrologue() {
+    state.phase = 'prologue';
+    titleEl.textContent = '序章｜新手導師的第一天';
+    timeEl.textContent = '07:38';
+    setProgress(7);
+    renderSceneArt('classroom', '👨‍🏫', '五年二班');
+    storyEl.innerHTML = `
+      <p>「黃老師早！」</p>
+      <p>「黃老師！他拿我的鉛筆！」</p>
+      <p>「黃老師，我媽媽說聯絡簿要給你看！」</p>
+      <p>「黃老師——」</p>
+      <p>你才剛走進五年二班三分鐘，就已經有四個孩子同時叫你。</p>
+      <p>這時，資源班老師從門口探頭。</p>
+      <div class="quote">「黃老師，有空嗎？我想先跟你談一下小彥的事情。」</div>
+      <p>你看向教室裡的小彥。</p>
+      <p><strong>大學裡學過的「融合教育」、「IEP」、「合理調整」和「學生參與」，突然全部跑進你的腦袋。</strong></p>
+      <p>但真正站在教室裡，你才發現第一個問題不是「法規怎麼規定？」</p>
+      <div class="callout center"><strong>而是——「身為他的老師，我現在應該怎麼做？」</strong></div>
+      <p class="center"><strong>你的融合校園第一天，正式開始。</strong></p>`;
+
+    clearActions();
+    addButton('走進五年二班 →', 'primary', () => showScene(0));
+  }
+
+  function buildDynamicLevel7() {
+    const echoes = [];
+    if (state.answers.q4 === 0) echoes.push('「可是那題我會。你為什麼沒有讓我寫？」');
+    if (state.answers.q5 === 3) echoes.push('「我沒有說我要媽媽去。我只是說我會怕。」');
+    if (state.answers.q3 === 1) echoes.push('「為什麼每次他們不想跟我一組，就是我換？」');
+    if (state.answers.q6 === 0) echoes.push('「我今天本來想跑。可是老師說我記成績比較安全。那下次呢？」');
+    if (!echoes.length) echoes.push('「你今天有問我很多事情。可是有時候……我也不知道要怎麼選。」');
+
+    scenes[6].story = `
+      <p>小彥桌上放著數學小考、校外教學通知單，還有接力棒號碼貼紙。</p>
+      <div class="quote"><strong>「為什麼你們一直在討論我的事情？考卷也是。校外教學也是。體育課也是。可是有時候你們都沒有先問我。」</strong></div>
+      <div class="card-note">${echoes.map(text => `<p>${text}</p>`).join('')}</div>
+      <p>你突然明白：他不是在問「為什麼你們要幫我」。</p>
+      <div class="callout"><strong>他在問的是：「決定我的事情時，我有沒有在裡面？」</strong></div>`;
+  }
+
+  function showScene(index) {
+    state.phase = 'scene';
+    state.step = index;
+    if (index === 6) buildDynamicLevel7();
+
+    const scene = scenes[index];
+    titleEl.textContent = scene.title;
+    timeEl.textContent = scene.time;
+    setProgress(12 + index * 10.7);
+    renderSceneArt(scene.art, scene.icon, '五年二班的一天');
+    storyEl.innerHTML = scene.story;
+    clearActions();
+
+    scene.options.forEach((option, optionIndex) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'choice';
+      button.innerHTML = `<strong>${String.fromCharCode(65 + optionIndex)}｜${option.title}</strong><span>${option.text}</span>`;
+      button.addEventListener('click', () => chooseOption(scene, option, optionIndex));
+      actionsEl.appendChild(button);
+    });
+  }
+
+  function chooseOption(scene, option, optionIndex) {
+    state.answers[scene.id] = optionIndex;
+    addTraits(option.delta);
+
+    storyEl.innerHTML = `
+      <div class="subtle">你選擇了</div>
+      <h2>${option.title}</h2>
+      <p>${option.result}</p>
+      <div class="reflect"><strong>${option.reflect}</strong></div>`;
+
+    clearActions();
+    const isLast = state.step === scenes.length - 1;
+    addButton(isLast ? '走出校門 →' : '繼續今天的行程 →', 'primary', () => {
+      if (isLast) showDayComplete();
+      else showScene(state.step + 1);
+    });
+  }
+
+  function showDayComplete() {
+    state.phase = 'complete';
+    titleEl.textContent = 'DAY 1 COMPLETE';
+    timeEl.textContent = '17:02';
+    setProgress(100);
+    renderSceneArt('sunset', '🏫🌇', '國教院附小・放學');
+    storyEl.innerHTML = `
+      <p>你終於收好東西，走出五年二班。</p>
+      <p>經過校門時，警衛伯伯抬頭：</p>
+      <div class="quote">「黃老師，第一天還順利嗎？」</div>
+      <p>你想了一下。</p>
+      <p>「……學到很多。」</p>
+      <p>警衛伯伯點點頭。</p>
+      <div class="callout center"><strong>「明天還要來喔。」</strong></div>
+      <p class="center"><strong>今天，你做了八個決定。<br>這些決定，也慢慢形成了你的教師樣貌……</strong></p>`;
+
+    clearActions();
+    addButton('查看我的教師結局 →', 'primary', showEnding);
+  }
+
+  function getEndingKey() {
+    const t = state.traits;
+    const q7 = state.answers.q7;
+    const q8 = state.answers.q8;
+    const imperfectEarlier = ['q1','q2','q3','q4','q5','q6'].some(id => state.answers[id] !== 2);
+
+    if (q7 === 2 && q8 === 2 && imperfectEarlier && t.voice >= 5 && t.collaboration >= 4) return 'secret';
+
+    const dominant = [
+      ['care', t.care],
+      ['procedure', t.procedure],
+      ['solo', t.solo],
+      ['delegate', t.delegate],
+      ['same', t.same]
+    ].sort((a, b) => b[1] - a[1])[0];
+
+    if (dominant[1] >= 5) return dominant[0];
+
+    const integrated = t.rights + t.individual + t.voice + t.accommodation + t.collaboration;
+    if (integrated >= 16) return 'aware';
+    if (t.care >= 3) return 'care';
+    if (t.procedure >= 4) return 'procedure';
+    if (t.delegate >= 3) return 'delegate';
+    if (t.same >= 3) return 'same';
+    return 'aware';
+  }
+
+  function showEnding() {
+    state.phase = 'ending';
+    const ending = endingData[getEndingKey()];
+
+    titleEl.textContent = '你的教師結局';
+    timeEl.textContent = 'ENDING';
+    setProgress(100);
+    sceneEl.className = 'scene scene-ending';
+    sceneEl.innerHTML = `
+      <div class="scene-ending">
+        <div class="ending-icon">${ending.icon}</div>
+        <div class="school-badge">DAY 1 ENDING</div>
+      </div>`;
+
+    storyEl.innerHTML = `
+      <div class="center">
+        <div class="subtle">你今天成為了——</div>
+        <h2 class="ending-title">${ending.title}</h2>
+      </div>
+      <p>${ending.body}</p>
+      <div class="quote"><strong>${ending.quote}</strong></div>
+      <div class="tags">
+        <span class="tag">融合教育</span>
+        <span class="tag">合理調整</span>
+        <span class="tag">學生表意</span>
+        <span class="tag">個別化支持</span>
+        <span class="tag">平等參與</span>
+        <span class="tag">專業合作</span>
+      </div>`;
+
+    clearActions();
+    addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
+    addButton('↻ 再過一次五年二班的一天', 'secondary', restartGame);
+  }
+
+  function showConcepts() {
+    state.phase = 'concepts';
+    titleEl.textContent = '原來，你今天遇到的是……';
+    timeEl.textContent = '課堂接棒';
+    setProgress(100);
+    renderSceneArt('classroom', '🧭', '接下來，交給簡報把概念說清楚');
+    storyEl.innerHTML = `
+      <div class="card-note">
+        <strong>合理調整</strong><br>
+        不是單純把要求降低，而是思考如何移除妨礙學生參與與表現的障礙。
+      </div>
+      <div class="card-note">
+        <strong>學生表意</strong><br>
+        不是所有事情都交給學生決定，而是讓他的意見真正進入與自己有關的決策。
+      </div>
+      <div class="card-note">
+        <strong>融合教育</strong><br>
+        不只是「人在普通班」，也要思考學生能否實質參與學習與班級生活。
+      </div>
+      <div class="callout center"><strong>法規不只是在告訴老師「不能做什麼」。<br>它也提醒我們：哪些人的權利、聲音與需要，不能在決策中消失。</strong></div>
+      <p class="center subtle">接下來，跟著黃老師一起拆解這些情境背後的法規與權利概念。</p>`;
+
+    clearActions();
+    addButton('↻ 重新挑戰國教院附小', 'primary', restartGame);
+  }
+
+  function restartGame() {
+    state.phase = 'cover';
+    state.step = 0;
+    state.answers = {};
+    state.traits = initialTraits();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showCover();
+  }
+
+  showCover();
+})();

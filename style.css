@@ -1,0 +1,265 @@
+:root {
+  --bg: #f6f3ec;
+  --panel: #fffdf8;
+  --panel-2: #f0ede4;
+  --text: #26312d;
+  --muted: #68736d;
+  --border: #d8d3c7;
+  --accent: #315a50;
+  --accent-2: #dbe8e3;
+  --accent-3: #a05f36;
+  --good: #375f4b;
+  --shadow: 0 14px 35px rgba(42, 48, 44, 0.09);
+  --radius: 20px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top right, rgba(49,90,80,0.07), transparent 28rem),
+    var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  line-height: 1.75;
+}
+
+button, input, select, textarea { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+.app-shell {
+  width: min(860px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.2rem, 4vw, 1.85rem);
+  line-height: 1.25;
+}
+
+.time-pill {
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.65);
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.progress-wrap {
+  height: 8px;
+  border-radius: 999px;
+  background: #e7e2d8;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #50796e);
+  transition: width .35s ease;
+}
+
+.game-card {
+  border: 1px solid var(--border);
+  background: rgba(255,253,248,0.94);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.scene {
+  min-height: 180px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--panel-2);
+  margin-bottom: 22px;
+  position: relative;
+}
+
+.scene-cover,
+.scene-generic,
+.scene-ending {
+  min-height: 180px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.school-badge {
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: var(--accent);
+}
+
+.school-emoji,
+.scene-icon,
+.ending-icon { font-size: 4.2rem; line-height: 1; margin: 10px 0; }
+.scene-caption { color: var(--muted); font-size: .92rem; }
+
+.scene-classroom { background: linear-gradient(#e9eee9 0 46%, #ded4c7 46% 100%); }
+.scene-math { background: linear-gradient(135deg, #eee9df, #f8f5ef); }
+.scene-science { background: linear-gradient(135deg, #e8f0ed, #f4f2e8); }
+.scene-trip { background: linear-gradient(135deg, #e7eee7, #ede3d4); }
+.scene-sport { background: linear-gradient(135deg, #e2eee8, #f1eadc); }
+.scene-talk { background: linear-gradient(135deg, #f0ece5, #e8efec); }
+.scene-office { background: linear-gradient(135deg, #ebe8e0, #f6f0e5); }
+.scene-sunset { background: linear-gradient(180deg, #e8dcc8, #efc8a8); }
+
+.story { font-size: 1rem; }
+.story p { margin: 0 0 14px; }
+.story p:last-child { margin-bottom: 0; }
+
+.center { text-align: center; }
+.big-name { font-size: 1.9rem; font-weight: 900; margin: 4px 0; }
+.subtle { color: var(--muted); font-size: .92rem; }
+
+.card-note,
+.callout,
+.quote,
+.reflect {
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+
+.card-note,
+.callout { background: var(--panel-2); }
+.quote { border-left: 4px solid var(--accent); background: #f4f1e9; }
+.reflect { background: var(--accent-2); }
+
+.callout strong,
+.reflect strong { color: var(--accent); }
+
+.actions {
+  margin-top: 22px;
+  display: grid;
+  gap: 12px;
+}
+
+.choice,
+.primary,
+.secondary {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+  padding: 13px 15px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .12s ease, border-color .12s ease, background .12s ease;
+}
+
+.choice {
+  border: 1px solid var(--border);
+  background: #fbfaf6;
+  color: var(--text);
+}
+
+.choice strong { display: block; margin-bottom: 3px; }
+.choice span { color: var(--muted); font-size: .92rem; }
+
+.primary {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: white;
+  font-weight: 800;
+  text-align: center;
+}
+
+.secondary {
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font-weight: 700;
+  text-align: center;
+}
+
+.choice:focus-visible,
+.primary:focus-visible,
+.secondary:focus-visible {
+  outline: 3px solid rgba(49,90,80,0.22);
+  outline-offset: 2px;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .choice:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .primary:hover, .secondary:hover { transform: translateY(-1px); }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.tag {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: .8rem;
+  color: var(--muted);
+  background: rgba(255,255,255,.55);
+}
+
+.ending-title {
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
+  line-height: 1.35;
+  margin: 6px 0 12px;
+}
+
+.footer-note {
+  text-align: center;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: .78rem;
+}
+
+.noscript {
+  max-width: 720px;
+  margin: 24px auto;
+  padding: 16px;
+  background: #fff4dc;
+  border: 1px solid #e6c56c;
+  border-radius: 12px;
+}
+
+@media (max-width: 560px) {
+  .app-shell { width: min(100% - 18px, 860px); padding-top: 12px; }
+  .topbar { align-items: flex-start; }
+  .time-pill { font-size: .8rem; padding: 5px 9px; }
+  .game-card { padding: 13px; border-radius: 16px; }
+  .scene { min-height: 150px; margin-bottom: 18px; }
+  .scene-cover, .scene-generic, .scene-ending { min-height: 150px; }
+  .school-emoji, .scene-icon, .ending-icon { font-size: 3.4rem; }
+  .story { font-size: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; transition: none !important; }
+}
