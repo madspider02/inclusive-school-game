@@ -467,11 +467,16 @@
         <div class="big-name">黃老師</div>
         <div>職務：五年二班導師</div>
         <div>到職日：今天</div>
-        <div class="subtle designer-credit">設計者：國教院黃彥融副研究員</div>
       </div>
       <div class="card-note center"><strong>今日任務</strong><br>平安度過第一天（？）</div>
       <p class="center">你修過教育法規。你學過特殊教育。你知道什麼是融合教育。</p>
-      <p class="center"><strong>但是今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>`;
+      <p class="center"><strong>但是今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>
+      <div class="game-info">
+        <strong>遊戲資訊</strong><br>
+        設計者：國教院 黃彥融副研究員<br>
+        適用對象：師資生、教師培育課程<br>
+        主題：融合教育法規與實務判斷
+      </div>`;
 
     clearActions();
     addButton('打卡上班 →', 'primary', showPrologue);

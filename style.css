@@ -269,3 +269,15 @@ h1 {
   margin-top: 0.45rem;
   font-size: 0.95rem;
 }
+
+
+.game-info {
+  margin: 1.25rem auto 0;
+  padding: 0.9rem 1rem;
+  max-width: 420px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
