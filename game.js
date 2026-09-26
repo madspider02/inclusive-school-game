@@ -609,6 +609,19 @@
     return 'aware';
   }
 
+
+  function buildTeacherRadar() {
+    const t = state.traits;
+    const stars = (n) => '★'.repeat(Math.max(1, Math.min(5, n))) + '☆'.repeat(Math.max(0, 5 - Math.min(5, n)));
+    const max = (v) => Math.max(0, Math.min(5, Math.round(v)));
+    return `
+      <div>💬 學生表意　${stars(max(t.voice))}</div>
+      <div>🔍 個別化思考　${stars(max(t.individual))}</div>
+      <div>⚖️ 合理調整　${stars(max(t.accommodation))}</div>
+      <div>🤝 專業合作　${stars(max(t.collaboration || t.delegate))}</div>
+      <div>📚 法規與程序　${stars(max(t.procedure))}</div>`;
+  }
+
   function showEnding() {
     state.phase = 'ending';
     const ending = endingData[getEndingKey()];
@@ -623,6 +636,7 @@
         <div class="school-badge">DAY 1 ENDING</div>
       </div>`;
 
+    const radar = buildTeacherRadar();
     storyEl.innerHTML = `
       <div class="center">
         <div class="subtle">你今天成為了——</div>
@@ -630,6 +644,14 @@
       </div>
       <p>${ending.body}</p>
       <div class="quote"><strong>${ending.quote}</strong></div>
+      <div class="card-note">
+        <strong>我的融合教育教師雷達</strong><br><br>
+        ${radar}
+      </div>
+      <div class="card-note">
+        <strong>下一步，我可以成為……</strong><br>
+        好的融合教師不是永遠第一次就做出完美決定，而是在學生告訴我他的經驗時，願意重新理解與調整。
+      </div>
       <div class="tags">
         <span class="tag">融合教育</span>
         <span class="tag">合理調整</span>
