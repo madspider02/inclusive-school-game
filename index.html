@@ -2,34 +2,51 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#315a50">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#264f46">
   <meta name="description" content="新手老師大作戰：融合校園的一天——師資生融合教育情境決策遊戲">
   <title>新手老師大作戰：融合校園的一天</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
+
   <main class="app-shell" id="app">
     <header class="topbar" aria-label="遊戲狀態">
-      <div>
-        <div class="eyebrow">國教院附小・虛構校園</div>
-        <h1 id="screen-title">新手老師大作戰</h1>
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">國</div>
+        <div>
+          <div class="eyebrow">國教院附小・虛構校園</div>
+          <h1 id="screen-title">新手老師大作戰</h1>
+        </div>
       </div>
       <div class="time-pill" id="time-pill">報到日</div>
     </header>
 
-    <div class="progress-wrap" aria-label="遊戲進度">
-      <div class="progress-bar" id="progress-bar" style="width: 3%"></div>
-    </div>
+    <section class="hud" aria-label="遊戲進度">
+      <div class="progress-meta">
+        <span>黃老師的第一天</span>
+        <span id="progress-label">準備報到</span>
+      </div>
+      <div class="progress-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="3" aria-label="遊戲進度">
+        <div class="progress-bar" id="progress-bar" style="width: 3%"></div>
+      </div>
+      <div class="day-track" id="day-track" aria-label="八個情境進度"></div>
+    </section>
 
     <section class="game-card" aria-live="polite">
       <div class="scene" id="scene" role="img" aria-label="國教院附小校園情境插畫"></div>
-      <div class="story" id="story"></div>
-      <div class="actions" id="actions"></div>
+      <div class="content-panel">
+        <div class="story" id="story"></div>
+        <div class="actions" id="actions"></div>
+      </div>
     </section>
 
     <footer class="footer-note">
-      本遊戲為師資培育教學用途之虛構情境，不蒐集個人資料。
+      <span>本遊戲為師資培育教學用途之虛構情境</span>
+      <span aria-hidden="true">・</span>
+      <span>不蒐集個人資料</span>
     </footer>
   </main>
 

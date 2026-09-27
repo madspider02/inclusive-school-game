@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 230" width="420" height="230">
+      <rect x="0" y="0" width="420" height="230" rx="24" fill="#ffffff" fill-opacity="0.34"/><rect x="62" y="122" width="296" height="24" rx="8" fill="#a77e5e"/><rect x="92" y="80" width="86" height="42" rx="5" fill="#f7f2e7" transform="rotate(-4 135 101)"/><rect x="188" y="77" width="82" height="45" rx="5" fill="#eef3ef" transform="rotate(3 229 100)"/><rect x="281" y="84" width="52" height="38" rx="5" fill="#f3e1cd"/><g transform="translate(120 182)">
+      <circle cx="0" cy="0" r="22" fill="#f3c7a6"/>
+      <path d="M-20 -4 Q0 -27 20 -4 L16 -17 Q0 -30 -16 -17 Z" fill="#3a302a"/>
+      <circle cx="-7" cy="1" r="2" fill="#34312f"/><circle cx="7" cy="1" r="2" fill="#34312f"/>
+      <path d="M-5 10 Q0 14 5 10" fill="none" stroke="#8e5b4b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M-30 31 Q0 15 30 31 L35 78 L-35 78 Z" fill="#4d776b"/>
+    </g><g transform="translate(305 184)">
+      <circle cx="0" cy="0" r="22" fill="#f3c7a6"/>
+      <path d="M-20 -4 Q0 -27 20 -4 L16 -17 Q0 -30 -16 -17 Z" fill="#3a302a"/>
+      <circle cx="-7" cy="1" r="2" fill="#34312f"/><circle cx="7" cy="1" r="2" fill="#34312f"/>
+      <path d="M-5 10 Q0 14 5 10" fill="none" stroke="#8e5b4b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M-30 31 Q0 15 30 31 L35 78 L-35 78 Z" fill="#8c6b82"/>
+    </g>
+    </svg>

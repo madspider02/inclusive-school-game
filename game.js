@@ -7,6 +7,9 @@
   const sceneEl = document.getElementById('scene');
   const storyEl = document.getElementById('story');
   const actionsEl = document.getElementById('actions');
+  const dayTrackEl = document.getElementById('day-track');
+  const progressLabelEl = document.getElementById('progress-label');
+  const progressWrapEl = document.querySelector('.progress-wrap');
 
   const initialTraits = () => ({
     rights: 0,
@@ -422,18 +425,71 @@
     });
   }
 
-  function setProgress(value) {
-    progressEl.style.width = `${Math.max(0, Math.min(100, value))}%`;
+  function setProgress(value, label = '') {
+    const safe = Math.max(0, Math.min(100, value));
+    progressEl.style.width = `${safe}%`;
+    progressWrapEl?.setAttribute('aria-valuenow', String(Math.round(safe)));
+    if (progressLabelEl && label) progressLabelEl.textContent = label;
+  }
+
+  function updateDayTrack(current = -1, completed = false) {
+    if (!dayTrackEl) return;
+    dayTrackEl.classList.toggle('is-idle', current < 0 && !completed);
+    dayTrackEl.innerHTML = Array.from({ length: 8 }, (_, i) => {
+      const cls = completed || i < current ? 'done' : (i === current ? 'current' : '');
+      return `<span class="day-node ${cls}" aria-label="第 ${i + 1} 關${completed || i < current ? '已完成' : i === current ? '進行中' : '尚未開始'}"></span>`;
+    }).join('');
+  }
+
+  function animateScreen() {
+    const card = document.querySelector('.game-card');
+    if (!card) return;
+    card.classList.remove('screen-enter');
+    void card.offsetWidth;
+    card.classList.add('screen-enter');
+  }
+
+  function sceneImagePath(kind) {
+    const files = {
+      classroom: 'classroom.png',
+      math: 'math.png',
+      science: 'science.png',
+      trip: 'fieldtrip.png',
+      sport: 'sport.png',
+      talk: 'talk.png',
+      office: 'office.png',
+      sunset: 'ending.png'
+    };
+    return `assets/${files[kind] || files.classroom}`;
+  }
+
+  function sceneLabel(kind, caption) {
+    const labels = {
+      classroom: ['晨間教室', '第一次真正面對學生差異'],
+      math: ['數學課', '公平與評量的選擇'],
+      science: ['自然課', '同儕合作與參與'],
+      trip: ['午間討論', '校外教學與合理調整'],
+      sport: ['體育課', '安全、風險與參與'],
+      talk: ['放學前', '學生開始說出自己的想法'],
+      office: ['放學後', '把個人努力變成團隊支持'],
+      sunset: ['17:02', '國教院附小・放學']
+    };
+    return labels[kind] || ['國教院附小', caption];
   }
 
   function renderSceneArt(kind, icon, caption) {
+    const [kicker, note] = sceneLabel(kind, caption);
     sceneEl.className = `scene scene-${kind}`;
     sceneEl.innerHTML = `
-      <div class="scene-generic">
-        <div class="scene-icon">${icon}</div>
-        <div class="school-badge">國教院附小</div>
-        <div class="scene-caption">${caption}</div>
+      <div class="scene-illustration">
+        <div class="scene-copy">
+          <div class="scene-kicker">${icon} ${kicker}</div>
+          <div class="scene-headline">${caption}</div>
+          <div class="scene-note">${note}</div>
+        </div>
+        <div class="scene-svg-wrap"><img class="scene-svg" src="${sceneImagePath(kind)}" alt="" aria-hidden="true"></div>
       </div>`;
+    animateScreen();
   }
 
   function clearActions() {
@@ -451,23 +507,23 @@
 
   function showCover() {
     state.phase = 'cover';
-    titleEl.textContent = '國教院附小';
+    titleEl.textContent = '新手老師大作戰';
     timeEl.textContent = '報到日';
-    setProgress(3);
+    setProgress(3, '準備報到');
+    updateDayTrack(-1, false);
     sceneEl.className = 'scene';
     sceneEl.innerHTML = `
-      <div class="scene-cover">
-        <div class="cover-icon">🏫</div>
-        <div class="cover-school-name">歡迎來到國教院附小</div>
-        <div class="scene-caption">今天，是你到學校報到的第一天。</div>
+      <div class="cover-hero">
+        <div class="cover-copy">
+          <div class="cover-school-name">國教院附小・虛構校園</div>
+          <h2 class="cover-big">新手老師<br>大作戰</h2>
+          <div class="cover-sub">融合校園的一天</div>
+          <div class="cover-line">一場關於融合教育、合理調整與學生參與的情境決策遊戲</div>
+        </div>
+        <img class="school-illustration" src="assets/cover.png" alt="國教院附小校園插畫">
       </div>`;
 
     storyEl.innerHTML = `
-      <div class="cover-heading center">
-        <h2 class="cover-main-title">新手老師大作戰</h2>
-        <div class="cover-main-subtitle">融合校園的一天</div>
-        <p class="subtle">一場關於融合教育、合理調整與學生參與的情境決策遊戲</p>
-      </div>
       <div class="id-card center">
         <div class="subtle">國教院附小｜教師識別證</div>
         <div class="big-name">黃老師</div>
@@ -481,13 +537,15 @@
 
     clearActions();
     addButton('開始我的第一天 →', 'primary', showPrologue);
+    animateScreen();
   }
 
   function showPrologue() {
     state.phase = 'prologue';
     titleEl.textContent = '序章｜新手導師的第一天';
     timeEl.textContent = '07:38';
-    setProgress(7);
+    setProgress(7, '07:38・走進五年二班');
+    updateDayTrack(-1, false);
     renderSceneArt('classroom', '👨‍🏫', '五年二班');
     storyEl.innerHTML = `
       <p>「黃老師早！」</p>
@@ -531,8 +589,9 @@
     const scene = scenes[index];
     titleEl.textContent = scene.title;
     timeEl.textContent = scene.time;
-    setProgress(12 + index * 10.7);
-    renderSceneArt(scene.art, scene.icon, '五年二班的一天');
+    setProgress(12 + index * 10.7, `第 ${index + 1} 關 / 8`);
+    updateDayTrack(index, false);
+    renderSceneArt(scene.art, scene.icon, scene.title.replace(/^第[一二三四五六七八]關｜/, ''));
     storyEl.innerHTML = scene.story;
     clearActions();
 
@@ -540,7 +599,7 @@
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'choice';
-      button.innerHTML = `<strong>${String.fromCharCode(65 + optionIndex)}｜${option.title}</strong><span>${option.text}</span>`;
+      button.innerHTML = `<span class="choice-letter">${String.fromCharCode(65 + optionIndex)}</span><span class="choice-copy"><strong>${option.title}</strong><span>${option.text}</span></span>`;
       button.addEventListener('click', () => chooseOption(scene, option, optionIndex));
       actionsEl.appendChild(button);
     });
@@ -551,10 +610,13 @@
     addTraits(option.delta);
 
     storyEl.innerHTML = `
-      <div class="subtle">你選擇了</div>
-      <h2>${option.title}</h2>
+      <div class="decision-summary">
+        <div class="decision-check">✓</div>
+        <div><div class="subtle">你剛才的決定</div><strong>${option.title}</strong></div>
+      </div>
       <p>${option.result}</p>
-      <div class="reflect"><strong>${option.reflect}</strong></div>`;
+      <div class="reflect"><strong>想一想：${option.reflect}</strong></div>`;
+    animateScreen();
 
     clearActions();
     const isLast = state.step === scenes.length - 1;
@@ -568,8 +630,9 @@
     state.phase = 'complete';
     titleEl.textContent = 'DAY 1 COMPLETE';
     timeEl.textContent = '17:02';
-    setProgress(100);
-    renderSceneArt('sunset', '🏫🌇', '國教院附小・放學');
+    setProgress(100, 'DAY 1 COMPLETE');
+    updateDayTrack(8, true);
+    renderSceneArt('sunset', '🏫🌇', '第一天，完成');
     storyEl.innerHTML = `
       <p>你終於收好東西，走出五年二班。</p>
       <p>經過校門時，警衛伯伯抬頭：</p>
@@ -704,14 +767,19 @@
     const data = getGrowthCardData();
     titleEl.textContent = '我的教師成長紀錄';
     timeEl.textContent = 'DAY 1 COMPLETE';
-    setProgress(100);
+    setProgress(100, '教師成長紀錄');
+    updateDayTrack(8, true);
     sceneEl.className = 'scene scene-ending';
     sceneEl.innerHTML = `
-      <div class="scene-ending">
-        <div class="ending-icon">${data.ending.icon}</div>
-        <div class="school-badge">DAY 1 COMPLETE</div>
-        <div class="scene-caption">黃老師，你今天看見了自己的教師樣貌</div>
+      <div class="ending-hero">
+        <div>
+          <div class="ending-icon-bubble">${data.ending.icon}</div>
+          <div class="school-badge">DAY 1 COMPLETE</div>
+          <div class="scene-headline" style="max-width:none;margin-top:7px">${data.ending.title}</div>
+          <div class="scene-caption">黃老師，你今天看見了自己的教師樣貌</div>
+        </div>
       </div>`;
+    animateScreen();
 
     storyEl.innerHTML = `
       <div class="growth-card">
@@ -760,7 +828,8 @@
     state.phase = 'concepts';
     titleEl.textContent = '原來，你今天遇到的是……';
     timeEl.textContent = '課堂接棒';
-    setProgress(100);
+    setProgress(100, '課堂接棒');
+    updateDayTrack(8, true);
     renderSceneArt('classroom', '🧭', '接下來，交給簡報把概念說清楚');
     storyEl.innerHTML = `
       <div class="card-note">
@@ -909,5 +978,6 @@
     showCover();
   }
 
+  updateDayTrack(-1, false);
   showCover();
 })();

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 320" width="430" height="320">
+  <circle cx="340" cy="66" r="34" fill="#e8ad57" opacity=".9"/>
+  <path d="M40 268 Q100 220 168 244 T300 238 T416 260 V320 H40Z" fill="#aac5aa"/>
+  <path d="M82 145 h266 v126 H82Z" fill="#fbf4e6" stroke="#58796f" stroke-width="7"/>
+  <path d="M63 145 h306 l-43-51 H108Z" fill="#52786d"/>
+  <rect x="183" y="194" width="68" height="77" rx="5" fill="#7ea195"/>
+  <g fill="#d8e8e3" stroke="#6d8f84" stroke-width="4">
+    <rect x="111" y="170" width="46" height="42" rx="4"/><rect x="276" y="170" width="46" height="42" rx="4"/>
+  </g>
+  <rect x="145" y="111" width="140" height="42" rx="8" fill="#fffaf0" stroke="#58796f" stroke-width="5"/>
+  <text x="215" y="139" text-anchor="middle" font-size="22" font-weight="900" fill="#315a50" font-family="Noto Sans CJK TC">國教院附小</text>
+  <path d="M48 271 h330" stroke="#96765e" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="64" cy="238" r="28" fill="#7eaa7a"/><circle cx="367" cy="236" r="31" fill="#78a274"/>
+  <path d="M63 251 v38 M367 251 v38" stroke="#7c624e" stroke-width="9" stroke-linecap="round"/>
+</svg>

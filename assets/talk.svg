@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 230" width="420" height="230">
+      <rect x="0" y="0" width="420" height="230" rx="24" fill="#ffffff" fill-opacity="0.34"/><rect x="80" y="145" width="260" height="18" rx="9" fill="#99785f"/><g transform="translate(142 104)">
+      <circle cx="0" cy="0" r="22" fill="#f3c7a6"/>
+      <path d="M-20 -4 Q0 -27 20 -4 L16 -17 Q0 -30 -16 -17 Z" fill="#3a302a"/>
+      <circle cx="-7" cy="1" r="2" fill="#34312f"/><circle cx="7" cy="1" r="2" fill="#34312f"/>
+      <path d="M-5 10 Q0 14 5 10" fill="none" stroke="#8e5b4b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M-30 31 Q0 15 30 31 L35 78 L-35 78 Z" fill="#4d776b"/>
+    </g><g transform="translate(280 106)">
+      <circle cx="0" cy="0" r="22" fill="#f3c7a6"/>
+      <path d="M-20 -4 Q0 -27 20 -4 L16 -17 Q0 -30 -16 -17 Z" fill="#3a302a"/>
+      <circle cx="-7" cy="1" r="2" fill="#34312f"/><circle cx="7" cy="1" r="2" fill="#34312f"/>
+      <path d="M-5 10 Q0 14 5 10" fill="none" stroke="#8e5b4b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M-30 31 Q0 15 30 31 L35 78 L-35 78 Z" fill="#748ba0"/>
+    </g><path d="M175 43 h92 q15 0 15 15 v39 q0 15-15 15 h-50 l-26 18 5-18 h-21 q-15 0-15-15 v-39 q0-15 15-15Z" fill="#fffdf8" stroke="#78968b" stroke-width="4"/><circle cx="195" cy="78" r="4" fill="#315a50"/><circle cx="220" cy="78" r="4" fill="#315a50"/><circle cx="245" cy="78" r="4" fill="#315a50"/>
+    </svg>
