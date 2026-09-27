@@ -373,45 +373,45 @@
   const endingData = {
     aware: {
       icon: '🌱',
-      title: '具有法規意識的融合教師',
-      body: '你不一定每一次都知道答案。但遇到問題時，你開始會問：學生遇到什麼障礙？他怎麼想？我們能調整什麼？誰可以一起協助？',
+      title: '權利導向型融合教師',
+      body: '你開始從學生權利、實質參與與環境支持的角度思考教育決定。你不只在問「怎麼做」，也在問「這樣做會不會讓學生更能參與？」。',
       quote: '「黃老師，恐龍在二樓。」「你查到了？」「我早就查到了。我只是想確認你會不會記得。」'
     },
     care: {
       icon: '❤️',
-      title: '善意滿滿的照顧型教師',
-      body: '你一直努力想「怎麼做對小彥最好」。只是有時候，你比小彥更快替他決定了什麼對他最好。',
+      title: '善意照顧型教師',
+      body: '你非常在意學生是否安全、是否被照顧好，也會積極保護學生不受挫折。你的關心很真誠，但有時候你會比學生更快替他決定什麼對他最好。',
       quote: '「黃老師，你不用每次都幫我。我不會的時候會跟你說。」'
     },
     procedure: {
       icon: '📋',
-      title: '照表操課的法規型教師',
-      body: '你知道專業決定需要依據，這是很好的基礎。但文件記錄的是學生的需要，不能完全取代眼前這個學生。',
+      title: '法規依循型教師',
+      body: '你知道專業決定需要依據，會先看 IEP、文件與程序，這是重要基礎。下一步，是讓制度與眼前的學生經驗一起工作。',
       quote: '小彥看著自己的 IEP 問：「黃老師，這裡面都是我嗎？」'
     },
     solo: {
       icon: '🔥',
-      title: '一個人扛下所有事情的熱血教師',
-      body: '你願意為學生多做一點。但如果融合教育只能靠一位老師不斷「多做一點」，那可能不是一個能長久運作的支持系統。',
+      title: '熱血投入型教師',
+      body: '你願意為學生多做一點，也想把事情弄懂、弄好。你的投入很可貴，但融合教育若只靠一位老師獨自撐住，往往難以長久。',
       quote: '陳老師傳訊息：「你還在工作？」你回：「快好了。……應該。」'
     },
     delegate: {
       icon: '🧑‍🏫',
-      title: '把特教交給特教的老師',
-      body: '你知道合作的重要，也習慣尋求特教專業。但小彥一天大部分的時間，並不在資源班。',
+      title: '專業合作型教師',
+      body: '你知道合作的重要，也會想到尋求特教專業支持。下一步，是在合作中更清楚自己身為導師的角色，而不是把責任全部交出去。',
       quote: '「黃老師，你明天還是我的老師嗎？」「當然啊。」「那就好。」'
     },
     same: {
       icon: '⚖️',
-      title: '「我對每個人都一樣」的公平教師',
-      body: '你很在意不偏心，因此盡可能讓所有人遵守相同規則。但當每個人的障礙不同，「完全一樣」一定能帶來公平嗎？',
+      title: '一致公平型教師',
+      body: '你很在意不偏心，因此會傾向讓大家遵守相同規則。這份公平感很重要；下一步，是思考「完全一樣」和「實質平等」之間的差別。',
       quote: '「如果我看題目真的比較久，我一定要跟阿哲一樣快，才算公平嗎？」'
     },
     secret: {
       icon: '🔓',
-      title: '隱藏結局｜「可以再商量老師」',
-      body: '你今天並不是每一次都做出最理想的決定。但當小彥告訴你他的感受，你願意重新聽、重新想，也願意修正。',
-      quote: '隔天桌上有張紙條：「昨天有一些事情我不喜歡。但是你後來有問我。所以今天如果有事情，我們可以再商量。——小彥」'
+      title: '可以再商量老師',
+      body: '你今天不一定每一次都做出最理想的決定，但當小彥說出自己的感受時，你願意重新聽、重新想，也願意修正。這正是教師專業成長最珍貴的地方。',
+      quote: '紙條上寫著：「昨天有一些事情我不喜歡。但是你後來有問我。所以今天如果有事情，我們可以再商量。——小彥」'
     }
   };
 
@@ -456,25 +456,30 @@
     sceneEl.className = 'scene';
     sceneEl.innerHTML = `
       <div class="scene-cover">
-        <div class="school-badge">國教院附小</div>
-        <div class="school-emoji">🏫</div>
-        <div class="scene-caption">五年二班・黃老師報到</div>
+        <div class="cover-row">
+          <div class="school-badge">國教院附小</div>
+          <div class="school-emoji">🏫</div>
+          <div class="scene-caption">融合校園的一天</div>
+        </div>
       </div>`;
 
     storyEl.innerHTML = `
       <div class="center">
+        <div class="subtle">一場關於融合教育、合理調整與學生參與的情境決策遊戲</div>
+      </div>
+      <div class="id-card center">
         <div class="subtle">國教院附小｜教師識別證</div>
         <div class="big-name">黃老師</div>
         <div>職務：五年二班導師</div>
         <div>到職日：今天</div>
-        <div class="subtle designer-credit">設計者：國教院黃彥融副研究員</div>
       </div>
-      <div class="card-note center"><strong>今日任務</strong><br>平安度過第一天（？）</div>
+      <div class="card-note center"><strong>今日任務</strong><br>走進五年二班，完成你的第一天。</div>
       <p class="center">你修過教育法規。你學過特殊教育。你知道什麼是融合教育。</p>
-      <p class="center"><strong>但是今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>`;
+      <p class="center"><strong>但今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>
+      <div class="author-note center small"><strong>遊戲設計與內容策劃</strong><br>國家教育研究院 黃彥融副研究員</div>`;
 
     clearActions();
-    addButton('打卡上班 →', 'primary', showPrologue);
+    addButton('開始我的第一天 →', 'primary', showPrologue);
   }
 
   function showPrologue() {
@@ -575,7 +580,7 @@
       <p class="center"><strong>今天，你做了八個決定。<br>這些決定，也慢慢形成了你的教師樣貌……</strong></p>`;
 
     clearActions();
-    addButton('查看我的教師結局 →', 'primary', showEnding);
+    addButton('查看我的教師成長紀錄 →', 'primary', showGrowthRecord);
   }
 
   function getEndingKey() {
@@ -605,40 +610,135 @@
     return 'aware';
   }
 
-  function showEnding() {
-    state.phase = 'ending';
-    const ending = endingData[getEndingKey()];
+  function computeRadar() {
+    const t = state.traits;
+    const toFive = (n) => Math.max(1, Math.min(5, Math.round(n)));
+    return {
+      voice: toFive((t.voice / 2.2) + (state.answers.q7 === 2 ? 1 : 0)),
+      individual: toFive((t.individual / 2.1)),
+      accommodation: toFive((t.accommodation / 2.2)),
+      collaboration: toFive((t.collaboration / 1.8)),
+      procedure: toFive((t.procedure / 2.1))
+    };
+  }
 
-    titleEl.textContent = '你的教師結局';
-    timeEl.textContent = 'ENDING';
+  function stars(n) {
+    return '★'.repeat(n) + '☆'.repeat(5 - n);
+  }
+
+  function radarRowsHtml(radar) {
+    const items = [
+      ['💬 學生表意', radar.voice],
+      ['🔍 個別化思考', radar.individual],
+      ['⚖️ 合理調整', radar.accommodation],
+      ['🤝 專業合作', radar.collaboration],
+      ['📚 法規程序', radar.procedure]
+    ];
+    return items.map(([label, val]) => `
+      <div class="radar-row">
+        <div class="radar-label">${label}</div>
+        <div class="radar-track"><div class="radar-fill" style="width:${val * 20}%"></div></div>
+        <div class="radar-stars">${stars(val)}</div>
+      </div>`).join('');
+  }
+
+  function getGrowthFeedback(key) {
+    const feedback = {
+      aware: {
+        strength: '你願意停下來理解學生的處境，並思考如何移除參與障礙。',
+        next: '持續把這些理念轉化為更具體的教學支持與班級經營策略。'
+      },
+      care: {
+        strength: '你願意保護學生，也願意投入協助，對學生很有同理心。',
+        next: '在提供支持前，先邀請學生參與決定，讓關心與表意一起出現。'
+      },
+      procedure: {
+        strength: '你重視制度與依據，知道 IEP 與法規程序是重要基礎。',
+        next: '除了看文件，也多回到學生當下的感受與具體情境。'
+      },
+      solo: {
+        strength: '你願意承擔責任，也會主動學習，對學生非常投入。',
+        next: '練習把支持工作轉化為團隊合作，而不是獨自承擔全部。'
+      },
+      delegate: {
+        strength: '你知道專業合作的重要，願意尋求不同專業的協助。',
+        next: '在合作中更清楚自己的角色，讓支持成為共同工作，而不是完全轉交。'
+      },
+      same: {
+        strength: '你重視公平一致，不希望任何學生被偏心或被忽略。',
+        next: '再往前一步思考：形式上的一樣，是否真的能帶來實質平等。'
+      },
+      secret: {
+        strength: '你願意在學生回應之後重新思考，展現出真正的專業成長能力。',
+        next: '把這種「可再商量」的態度帶進更多日常情境，形成穩定的班級文化。'
+      }
+    };
+    return feedback[key];
+  }
+
+  function getRethink() {
+    const priorities = [];
+    if (state.answers.q2 !== 2) priorities.push('「老師，為什麼他可以？」——我想重新思考公平與合理調整。');
+    if (state.answers.q5 !== 2) priorities.push('「我會怕，可是我還是想去。」——我想重新思考安全與參與如何並存。');
+    if (state.answers.q7 !== 2) priorities.push('「可是你們沒有先問我。」——我想重新思考學生表意如何真正進入決策。');
+    if (state.answers.q3 !== 2) priorities.push('「我們這組不要小彥！」——我想重新思考同儕合作與個別化支持。');
+    return priorities[0] || '今天有些地方做得不錯，但我仍想繼續練習：先問學生，再一起找支持方法。';
+  }
+
+  function getGrowthCardData() {
+    const key = getEndingKey();
+    return {
+      key,
+      ending: endingData[key],
+      radar: computeRadar(),
+      feedback: getGrowthFeedback(key),
+      rethink: getRethink()
+    };
+  }
+
+  function showGrowthRecord() {
+    state.phase = 'growth';
+    const data = getGrowthCardData();
+    titleEl.textContent = '我的教師成長紀錄';
+    timeEl.textContent = 'DAY 1 COMPLETE';
     setProgress(100);
     sceneEl.className = 'scene scene-ending';
     sceneEl.innerHTML = `
       <div class="scene-ending">
-        <div class="ending-icon">${ending.icon}</div>
-        <div class="school-badge">DAY 1 ENDING</div>
+        <div class="ending-icon">${data.ending.icon}</div>
+        <div class="school-badge">DAY 1 COMPLETE</div>
+        <div class="scene-caption">黃老師，你今天看見了自己的教師樣貌</div>
       </div>`;
 
     storyEl.innerHTML = `
-      <div class="center">
-        <div class="subtle">你今天成為了——</div>
-        <h2 class="ending-title">${ending.title}</h2>
+      <div class="growth-card">
+        <div class="subtle">這不是你的標籤，而是你今天在情境中展現出的教師傾向。</div>
+        <h2>${data.ending.title}</h2>
+        <p>${data.ending.body}</p>
+        <div class="quote"><strong>${data.ending.quote}</strong></div>
       </div>
-      <p>${ending.body}</p>
-      <div class="quote"><strong>${ending.quote}</strong></div>
-      <div class="tags">
-        <span class="tag">融合教育</span>
-        <span class="tag">合理調整</span>
-        <span class="tag">學生表意</span>
-        <span class="tag">個別化支持</span>
-        <span class="tag">平等參與</span>
-        <span class="tag">專業合作</span>
-      </div>`;
+      <div class="radar-card">
+        <h3>📊 我的融合教育教師雷達</h3>
+        ${radarRowsHtml(data.radar)}
+      </div>
+      <div class="growth-card">
+        <h3>✨ 我的優勢</h3>
+        <p>${data.feedback.strength}</p>
+      </div>
+      <div class="growth-card">
+        <h3>🌱 我的下一步</h3>
+        <p>${data.feedback.next}</p>
+      </div>
+      <div class="growth-card">
+        <h3>💭 我的重新思考</h3>
+        <p>${data.rethink}</p>
+      </div>
+      <div class="callout center"><strong>好的融合教師，不是永遠第一次就做出完美決定的人，<br>而是在學生的聲音出現後，願意重新理解、重新調整的人。</strong></div>`;
 
     clearActions();
     addButton('📸 保存我的教師成長紀錄', 'secondary', saveGrowthCard);
     addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
-    addButton('↻ 再過一次五年二班的一天', 'secondary', restartGame);
+    addButton('↻ 再挑戰五年二班的一天', 'secondary', restartGame);
   }
 
   function showConcepts() {
@@ -667,15 +767,44 @@
     addButton('↻ 重新挑戰國教院附小', 'primary', restartGame);
   }
 
-
   function saveGrowthCard() {
-    const ending = endingData[getEndingKey()];
-    const card = `我的教師成長紀錄\n\n新手老師大作戰：融合校園的一天\n\n我的教師樣貌：${ending.title}\n\n今天的提醒：\n好的融合教師，不是永遠第一次就做出完美決定的人，而是在學生的聲音出現後，願意重新理解、重新調整的人。\n\n設計與內容策劃：國家教育研究院 黃彥融副研究員`;
+    const data = getGrowthCardData();
+    const radar = data.radar;
+    const rows = [
+      ['學生表意', radar.voice],
+      ['個別化思考', radar.individual],
+      ['合理調整', radar.accommodation],
+      ['專業合作', radar.collaboration],
+      ['法規程序', radar.procedure]
+    ].map(([label, val]) => `<div style="margin:6px 0"><strong>${label}</strong>：${stars(val)}</div>`).join('');
+
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>我的教師成長紀錄</title></head>
+      <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC','Microsoft JhengHei',sans-serif;background:#f6f3ec;padding:24px;line-height:1.75;color:#26312d;">
+        <div style="max-width:760px;margin:0 auto;background:#fffdf8;border:1px solid #d8d3c7;border-radius:18px;padding:28px;">
+          <div style="color:#68736d;font-size:14px;">新手老師大作戰：融合校園的一天</div>
+          <h1 style="margin:6px 0 12px;font-size:30px;">我的教師成長紀錄</h1>
+          <div style="background:#f0ede4;border-radius:14px;padding:16px;margin:14px 0;">
+            <div style="font-size:15px;color:#68736d;">我的教師樣貌</div>
+            <div style="font-size:28px;font-weight:900;margin:4px 0;">${data.ending.icon} ${data.ending.title}</div>
+            <div>${data.ending.body}</div>
+          </div>
+          <div style="background:#f7f5ee;border-radius:14px;padding:16px;margin:14px 0;">
+            <div style="font-weight:800;margin-bottom:8px;">📊 我的融合教育教師雷達</div>
+            ${rows}
+          </div>
+          <div style="margin:14px 0;"><strong>✨ 我的優勢</strong><br>${data.feedback.strength}</div>
+          <div style="margin:14px 0;"><strong>🌱 我的下一步</strong><br>${data.feedback.next}</div>
+          <div style="margin:14px 0;"><strong>💭 我的重新思考</strong><br>${data.rethink}</div>
+          <div style="margin-top:18px;padding:14px 16px;background:#dbe8e3;border-radius:14px;font-weight:700;">好的融合教師，不是永遠第一次就做出完美決定的人，而是在學生的聲音出現後，願意重新理解、重新調整的人。</div>
+          <div style="margin-top:18px;font-size:14px;color:#68736d;">遊戲設計與內容策劃：國家教育研究院 黃彥融副研究員</div>
+        </div>
+        <script>window.onload=()=>setTimeout(()=>window.print(),300);</script>
+      </body></html>`;
+
     const w = window.open('', '_blank');
-    w.document.write('<html><head><title>我的教師成長紀錄</title></head><body style="font-family:sans-serif;white-space:pre-wrap;padding:40px;font-size:22px;line-height:1.8">'+card.replace(/</g,'&lt;')+'</body></html>');
+    w.document.write(html);
     w.document.close();
     w.focus();
-    w.print();
   }
 
   function restartGame() {

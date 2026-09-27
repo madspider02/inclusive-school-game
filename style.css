@@ -55,6 +55,8 @@ h1 {
   line-height: 1.25;
 }
 
+h2, h3 { margin: 0 0 10px; line-height: 1.35; }
+
 .time-pill {
   flex: none;
   border: 1px solid var(--border);
@@ -89,7 +91,7 @@ h1 {
 }
 
 .scene {
-  min-height: 180px;
+  min-height: 220px;
   border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
@@ -101,14 +103,48 @@ h1 {
 .scene-cover,
 .scene-generic,
 .scene-ending {
-  min-height: 180px;
-  padding: 22px;
+  min-height: 220px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
+
+.scene-cover {
+  background: linear-gradient(180deg, #ddeade 0%, #edf1e7 48%, #efe5d5 48%, #efe5d5 100%);
+  position: relative;
+}
+
+.scene-cover::before {
+  content: '';
+  position: absolute;
+  width: 160px;
+  height: 110px;
+  left: 50%;
+  top: 56%;
+  transform: translate(-50%, -50%);
+  background: #fbfaf6;
+  border: 3px solid #8aa094;
+  border-bottom-width: 6px;
+  border-radius: 10px 10px 4px 4px;
+  box-shadow: 0 10px 20px rgba(49,90,80,.1);
+}
+
+.scene-cover::after {
+  content: '國教院附小';
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  transform: translate(-50%, -63%);
+  color: var(--accent);
+  font-weight: 900;
+  letter-spacing: .1em;
+  z-index: 1;
+}
+
+.cover-row { position: relative; z-index: 2; }
 
 .school-badge {
   font-weight: 800;
@@ -118,7 +154,7 @@ h1 {
 
 .school-emoji,
 .scene-icon,
-.ending-icon { font-size: 4.2rem; line-height: 1; margin: 10px 0; }
+.ending-icon { font-size: 3.9rem; line-height: 1; margin: 8px 0; }
 .scene-caption { color: var(--muted); font-size: .92rem; }
 
 .scene-classroom { background: linear-gradient(#e9eee9 0 46%, #ded4c7 46% 100%); }
@@ -137,23 +173,33 @@ h1 {
 .center { text-align: center; }
 .big-name { font-size: 1.9rem; font-weight: 900; margin: 4px 0; }
 .subtle { color: var(--muted); font-size: .92rem; }
+.small { font-size: .85rem; }
 
+.id-card,
 .card-note,
 .callout,
 .quote,
-.reflect {
+.reflect,
+.author-note,
+.radar-card,
+.growth-card {
   border-radius: 14px;
   padding: 14px 16px;
   margin: 14px 0;
 }
 
+.id-card,
 .card-note,
 .callout { background: var(--panel-2); }
+.author-note { background: #f5f2eb; border: 1px dashed var(--border); }
 .quote { border-left: 4px solid var(--accent); background: #f4f1e9; }
 .reflect { background: var(--accent-2); }
+.growth-card { background: #fbfaf6; border: 1px solid var(--border); }
+.radar-card { background: #f7f5ee; border: 1px solid var(--border); }
 
 .callout strong,
-.reflect strong { color: var(--accent); }
+.reflect strong,
+.author-note strong { color: var(--accent); }
 
 .actions {
   margin-top: 22px;
@@ -221,51 +267,40 @@ h1 {
 .tag {
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 5px 10px;
-  font-size: .8rem;
-  color: var(--muted);
-  background: rgba(255,255,255,.55);
+  padding: 6px 10px;
+  font-size: .84rem;
+  background: #fff;
 }
 
-.ending-title {
-  font-size: clamp(1.5rem, 5vw, 2.25rem);
-  line-height: 1.35;
-  margin: 6px 0 12px;
+.radar-row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin: 10px 0;
 }
 
-.footer-note {
-  text-align: center;
-  margin-top: 14px;
-  color: var(--muted);
-  font-size: .78rem;
+.radar-label { font-weight: 700; }
+.radar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #e8e3d9;
+  overflow: hidden;
 }
-
-.noscript {
-  max-width: 720px;
-  margin: 24px auto;
-  padding: 16px;
-  background: #fff4dc;
-  border: 1px solid #e6c56c;
-  border-radius: 12px;
+.radar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #6b8d83);
 }
+.radar-stars { font-size: .92rem; color: var(--accent); font-weight: 700; }
 
-@media (max-width: 560px) {
-  .app-shell { width: min(100% - 18px, 860px); padding-top: 12px; }
-  .topbar { align-items: flex-start; }
-  .time-pill { font-size: .8rem; padding: 5px 9px; }
-  .game-card { padding: 13px; border-radius: 16px; }
-  .scene { min-height: 150px; margin-bottom: 18px; }
-  .scene-cover, .scene-generic, .scene-ending { min-height: 150px; }
-  .school-emoji, .scene-icon, .ending-icon { font-size: 3.4rem; }
-  .story { font-size: 1rem; }
-}
+.inline-list { margin: 8px 0 0 0; padding-left: 18px; }
+.footer-note { text-align: center; color: var(--muted); font-size: .86rem; padding-top: 16px; }
+.noscript { padding: 24px; text-align: center; }
 
-@media (prefers-reduced-motion: reduce) {
-  * { scroll-behavior: auto !important; transition: none !important; }
-}
-
-
-.designer-credit {
-  margin-top: 0.45rem;
-  font-size: 0.95rem;
+@media (max-width: 680px) {
+  .topbar { align-items: flex-start; flex-direction: column; }
+  .time-pill { align-self: flex-start; }
+  .radar-row { grid-template-columns: 1fr; }
+  .radar-stars { text-align: left; }
 }
