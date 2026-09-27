@@ -467,12 +467,9 @@
         <div class="big-name">黃老師</div>
         <div>職務：五年二班導師</div>
         <div>到職日：今天</div>
+        <div class="subtle designer-credit">設計者：國教院黃彥融副研究員</div>
       </div>
-      <div class="card-note center"><strong>遊戲任務</strong><br>平安度過第一天（？）</div>
-      <div class="card-note">
-        <strong>遊戲說明</strong><br>
-        這不是一場尋找標準答案的考試。真實教室裡，很多選擇都有理由；你的每個決定，都可能影響學生、同學、家長與教師之間的關係。
-      </div>
+      <div class="card-note center"><strong>今日任務</strong><br>平安度過第一天（？）</div>
       <p class="center">你修過教育法規。你學過特殊教育。你知道什麼是融合教育。</p>
       <p class="center"><strong>但是今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>`;
 
@@ -608,19 +605,6 @@
     return 'aware';
   }
 
-
-  function buildTeacherRadar() {
-    const t = state.traits;
-    const stars = (n) => '★'.repeat(Math.max(1, Math.min(5, n))) + '☆'.repeat(Math.max(0, 5 - Math.min(5, n)));
-    const max = (v) => Math.max(0, Math.min(5, Math.round(v)));
-    return `
-      <div>💬 學生表意　${stars(max(t.voice))}</div>
-      <div>🔍 個別化思考　${stars(max(t.individual))}</div>
-      <div>⚖️ 合理調整　${stars(max(t.accommodation))}</div>
-      <div>🤝 專業合作　${stars(max(t.collaboration || t.delegate))}</div>
-      <div>📚 法規與程序　${stars(max(t.procedure))}</div>`;
-  }
-
   function showEnding() {
     state.phase = 'ending';
     const ending = endingData[getEndingKey()];
@@ -635,7 +619,6 @@
         <div class="school-badge">DAY 1 ENDING</div>
       </div>`;
 
-    const radar = buildTeacherRadar();
     storyEl.innerHTML = `
       <div class="center">
         <div class="subtle">你今天成為了——</div>
@@ -643,14 +626,6 @@
       </div>
       <p>${ending.body}</p>
       <div class="quote"><strong>${ending.quote}</strong></div>
-      <div class="card-note">
-        <strong>我的融合教育教師雷達</strong><br><br>
-        ${radar}
-      </div>
-      <div class="card-note">
-        <strong>下一步，我可以成為……</strong><br>
-        好的融合教師不是永遠第一次就做出完美決定，而是在學生告訴我他的經驗時，願意重新理解與調整。
-      </div>
       <div class="tags">
         <span class="tag">融合教育</span>
         <span class="tag">合理調整</span>
