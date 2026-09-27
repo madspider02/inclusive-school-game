@@ -115,33 +115,43 @@ h2, h3 { margin: 0 0 10px; line-height: 1.35; }
 .scene-cover {
   background: linear-gradient(180deg, #ddeade 0%, #edf1e7 48%, #efe5d5 48%, #efe5d5 100%);
   position: relative;
+  gap: 12px;
 }
 
-.scene-cover::before {
-  content: '';
-  position: absolute;
-  width: 160px;
-  height: 110px;
-  left: 50%;
-  top: 56%;
-  transform: translate(-50%, -50%);
+.cover-label {
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: var(--accent);
+  font-size: 1.05rem;
+}
+
+.cover-card {
   background: #fbfaf6;
   border: 3px solid #8aa094;
   border-bottom-width: 6px;
-  border-radius: 10px 10px 4px 4px;
+  border-radius: 14px;
   box-shadow: 0 10px 20px rgba(49,90,80,.1);
+  min-width: 210px;
+  padding: 18px 24px 14px;
 }
 
-.scene-cover::after {
-  content: '國教院附小';
-  position: absolute;
-  left: 50%;
-  top: 56%;
-  transform: translate(-50%, -63%);
-  color: var(--accent);
+.cover-icon {
+  font-size: 3.6rem;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.cover-title {
+  font-size: 1.1rem;
   font-weight: 900;
-  letter-spacing: .1em;
-  z-index: 1;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.cover-subtitle {
+  color: var(--muted);
+  font-size: .98rem;
+  font-weight: 700;
 }
 
 .cover-row { position: relative; z-index: 2; }

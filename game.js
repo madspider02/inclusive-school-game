@@ -456,10 +456,11 @@
     sceneEl.className = 'scene';
     sceneEl.innerHTML = `
       <div class="scene-cover">
-        <div class="cover-row">
-          <div class="school-badge">國教院附小</div>
-          <div class="school-emoji">🏫</div>
-          <div class="scene-caption">融合校園的一天</div>
+        <div class="cover-label">國教院附小</div>
+        <div class="cover-card">
+          <div class="cover-icon">🏫</div>
+          <div class="cover-title">新手老師大作戰</div>
+          <div class="cover-subtitle">融合校園的一天</div>
         </div>
       </div>`;
 
