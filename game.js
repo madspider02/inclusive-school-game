@@ -1009,13 +1009,14 @@
           <button type="button" class="rethink-choice" data-rethink="voice"><strong>「可是你們沒有先問我。」</strong><span>學生表意</span></button>
         </div>
         <label class="reflection-label" for="reflection-input">下一次遇到類似情境，我會……</label>
-        <textarea id="reflection-input" class="reflection-input" maxlength="180" placeholder="寫下一句給未來自己的提醒（可留白）"></textarea>
+        <textarea id="reflection-input" class="reflection-input" maxlength="500" placeholder="${state.mode === 'research' ? '請至少寫20字，例如：我會先詢問學生的想法，再思考如何提供支持……' : '寫下一句給未來自己的提醒'}"></textarea>
+        <div id="reflection-count" class="reflection-count" aria-live="polite"></div>
       </div>
       ${state.mode === 'research' ? `
       <div class="research-note" id="research-submit-panel">
         <div class="mode-badge">RESEARCH MODE</div>
         <h3>願意分享你的學習歷程嗎？</h3>
-        <p>你已經先取得自己的教師成長紀錄。若你同意，系統會把本次遊戲選擇、背景資料、完成時間、重新挑戰次數、教師樣貌、五個雷達構面與反思文字送至研究資料表。</p>
+        <p>你已經先取得自己的教師成長紀錄。若你同意，系統會把本次遊戲選擇、背景資料、完成時間、重新挑戰次數、教師樣貌、五個雷達構面與反思文字送至研究資料表。研究資料提交前，請完成至少 20 字、最多 500 字的「我的重新思考」。</p>
         <div id="research-submit-status" class="subtle">研究資料尚未提交。</div>
       </div>` : ''}
       <div class="callout center"><strong>好的融合教師，不是永遠第一次就做出完美決定的人，<br>而是在學生的聲音出現後，願意重新理解、重新調整的人。</strong></div>`;
@@ -1034,8 +1035,27 @@
     addButton('看看今天其實遇到了什麼 →', 'secondary', showConcepts);
 
     const textarea = document.getElementById('reflection-input');
+    const reflectionCount = document.getElementById('reflection-count');
     textarea.value = state.reflection.text || '';
-    textarea.addEventListener('input', () => { state.reflection.text = textarea.value; });
+
+    const updateReflectionCount = () => {
+      const length = textarea.value.trim().length;
+      if (!reflectionCount) return;
+      if (state.mode === 'research') {
+        reflectionCount.textContent = `目前字數：${length} / 500（至少 20 字）`;
+        reflectionCount.classList.toggle('is-valid', length >= 20 && length <= 500);
+        reflectionCount.classList.toggle('is-invalid', length < 20);
+      } else {
+        reflectionCount.textContent = `目前字數：${length} / 500`;
+        reflectionCount.classList.remove('is-valid', 'is-invalid');
+      }
+    };
+
+    textarea.addEventListener('input', () => {
+      state.reflection.text = textarea.value;
+      updateReflectionCount();
+    });
+    updateReflectionCount();
 
     document.querySelectorAll('.rethink-choice').forEach(btn => {
       if (btn.dataset.rethink === state.reflection.choice) btn.classList.add('selected');
@@ -1090,8 +1110,27 @@
     status.textContent = message;
   }
 
+  function validateResearchReflection() {
+    const textarea = document.getElementById('reflection-input');
+    const text = (state.reflection.text || '').trim();
+    if (text.length < 20) {
+      setResearchSubmitStatus(`請先完成「我的重新思考」，至少需要 20 字（目前 ${text.length} 字）。`, 'error');
+      textarea?.focus();
+      textarea?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    }
+    if (text.length > 500) {
+      setResearchSubmitStatus('「我的重新思考」請控制在 500 字以內。', 'error');
+      textarea?.focus();
+      textarea?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    }
+    return true;
+  }
+
   async function sendResearchData() {
     if (state.mode !== 'research' || state.research.submitted) return;
+    if (!validateResearchReflection()) return;
     const payload = researchPayload();
     setResearchSubmitStatus('正在送出研究資料……');
     const buttons = Array.from(actionsEl.querySelectorAll('button'));

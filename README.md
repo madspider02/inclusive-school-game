@@ -15,3 +15,10 @@ GitHub Pages 可部署版本。
 - Apps Script endpoint 已接入 game.js。
 
 > 正式研究前，研究說明與知情同意文字請以研究倫理審查核准版本為準。
+
+
+## v5.1.1 update
+- Research Mode reflection is required before research-data submission.
+- Minimum 20 Chinese characters/characters after trimming; maximum 500.
+- Live character counter added.
+- General mode remains optional and does not submit research data.

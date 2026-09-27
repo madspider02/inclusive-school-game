@@ -587,3 +587,14 @@ h2, h3 { margin: 0 0 10px; line-height: 1.35; }
   .mode-grid, .form-grid { grid-template-columns: 1fr; }
   .form-field.full { grid-column: auto; }
 }
+
+/* v5.1.1 Reflection Required */
+.reflection-count {
+  margin-top: 7px;
+  min-height: 1.25em;
+  font-size: .82rem;
+  color: var(--muted);
+  text-align: right;
+}
+.reflection-count.is-valid { color: var(--green); font-weight: 800; }
+.reflection-count.is-invalid { color: #a34a36; font-weight: 800; }
