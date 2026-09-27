@@ -1,3 +1,2 @@
-v5.0 GitHub-ready
-Build: 2026-09-27
-Visual assets: external PNG files in assets/
+v5.1 Research Mode
+Built for GitHub Pages deployment.

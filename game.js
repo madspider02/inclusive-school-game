@@ -10,6 +10,9 @@
   const dayTrackEl = document.getElementById('day-track');
   const progressLabelEl = document.getElementById('progress-label');
   const progressWrapEl = document.querySelector('.progress-wrap');
+  const footerEl = document.getElementById('footer-note');
+
+  const RESEARCH_API = 'https://script.google.com/macros/s/AKfycbyjiE15KzX279g3ZAyXEkQMkLaM2H_SUXItuZuqeZbIH3zWu6N4bpT2ETTnpXZSmRtuCA/exec';
 
   const initialTraits = () => ({
     rights: 0,
@@ -24,12 +27,32 @@
     solo: 0
   });
 
+  const emptyResearchProfile = () => ({
+    nickname: '',
+    school: '',
+    department: '',
+    grade: '',
+    gender: '',
+    specialEd: '',
+    fieldExperience: ''
+  });
+
   const state = {
     phase: 'cover',
+    mode: null,
     step: 0,
     answers: {},
     traits: initialTraits(),
-    reflection: { choice: '', text: '' }
+    reflection: { choice: '', text: '' },
+    research: {
+      consented: false,
+      profile: emptyResearchProfile(),
+      startTime: null,
+      completionTime: 0,
+      restartCount: 0,
+      submitted: false,
+      declined: false
+    }
   };
 
   const scenes = [
@@ -419,6 +442,184 @@
     }
   };
 
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function setFooter(message) {
+    if (!footerEl) return;
+    footerEl.innerHTML = `<span>本遊戲為師資培育教學用途之虛構情境</span><span aria-hidden="true">・</span><span>${message}</span>`;
+  }
+
+  function resetRunState() {
+    state.step = 0;
+    state.answers = {};
+    state.traits = initialTraits();
+    state.reflection = { choice: '', text: '' };
+  }
+
+  function elapsedResearchSeconds() {
+    if (!state.research.startTime) return 0;
+    return Math.max(0, Math.floor((Date.now() - state.research.startTime) / 1000));
+  }
+
+  function startGeneralMode() {
+    resetRunState();
+    state.mode = 'general';
+    state.research = {
+      consented: false,
+      profile: emptyResearchProfile(),
+      startTime: null,
+      completionTime: 0,
+      restartCount: 0,
+      submitted: false,
+      declined: false
+    };
+    setFooter('一般模式不送出研究資料');
+    showPrologue();
+  }
+
+  function showResearchConsent() {
+    state.phase = 'research-consent';
+    state.mode = 'research';
+    titleEl.textContent = '研究參與模式';
+    timeEl.textContent = '研究說明';
+    setProgress(4, '研究說明與知情同意');
+    updateDayTrack(-1, false);
+    renderSceneArt('classroom', '🎓', '融合教育情境決策研究');
+    setFooter('研究模式僅在你同意提交後送出資料');
+
+    storyEl.innerHTML = `
+      <div class="research-note">
+        <div class="mode-badge">RESEARCH MODE</div>
+        <h2>研究參與說明</h2>
+        <p>本研究旨在了解師資生如何在融合教育情境中進行專業判斷，以及參與者如何反思自己的教育決策。</p>
+        <ul class="research-list">
+          <li><strong>你會做什麼：</strong>填寫基本背景資料，完成八個融合教育情境，並可留下簡短反思。</li>
+          <li><strong>系統會記錄：</strong>情境選擇、完成時間、重新挑戰次數、教師樣貌與五個教師雷達構面。</li>
+          <li><strong>姓名：</strong>不要求真實姓名；請自行設定暱稱，並避免使用可直接識別你的真實姓名。</li>
+          <li><strong>參與方式：</strong>你可隨時停止；遊戲結束後仍會先取得自己的教師成長紀錄，再自行決定是否提交研究資料。</li>
+        </ul>
+      </div>
+      <label class="consent-check" for="research-consent-check">
+        <input type="checkbox" id="research-consent-check">
+        <span><strong>我已閱讀上述說明，並同意進入研究參與模式。</strong><br><span class="subtle">正式研究使用時，請以研究倫理審查核准之研究說明內容為準。</span></span>
+      </label>
+      <div id="research-consent-error" class="subtle" role="alert"></div>`;
+
+    clearActions();
+    addButton('繼續填寫基本資料 →', 'primary', () => {
+      const checked = document.getElementById('research-consent-check')?.checked;
+      if (!checked) {
+        const err = document.getElementById('research-consent-error');
+        if (err) err.textContent = '請先勾選同意後再繼續。';
+        return;
+      }
+      state.research.consented = true;
+      showResearchForm();
+    });
+    addButton('← 返回首頁', 'secondary', showCover);
+  }
+
+  function showResearchForm() {
+    state.phase = 'research-form';
+    titleEl.textContent = '研究參與模式｜基本資料';
+    timeEl.textContent = '基本資料';
+    setProgress(5, '填寫研究基本資料');
+    updateDayTrack(-1, false);
+    renderSceneArt('classroom', '🗂️', '開始前，先認識一下你');
+    setFooter('研究模式｜不要求真實姓名');
+
+    const p = state.research.profile;
+    storyEl.innerHTML = `
+      <div class="research-note">
+        <h2>參與者基本資料</h2>
+        <p>以下資料將用於描述與分析師資生的背景差異。請使用暱稱，不需填寫真實姓名。</p>
+      </div>
+      <form id="research-form" class="research-form">
+        <div class="form-grid">
+          <div class="form-field full">
+            <label for="research-nickname">我的暱稱 *</label>
+            <input id="research-nickname" name="nickname" required maxlength="30" autocomplete="off" value="${escapeHtml(p.nickname)}" placeholder="例如：小安、Teacher01">
+            <div class="form-help">請勿使用真實姓名；此暱稱僅用於研究資料與遊戲中的稱呼。</div>
+          </div>
+          <div class="form-field">
+            <label for="research-school">就讀學校 *</label>
+            <input id="research-school" name="school" required maxlength="60" value="${escapeHtml(p.school)}" placeholder="例如：國立○○大學">
+          </div>
+          <div class="form-field">
+            <label for="research-department">就讀科系 *</label>
+            <input id="research-department" name="department" required maxlength="60" value="${escapeHtml(p.department)}" placeholder="例如：特殊教育學系">
+          </div>
+          <div class="form-field">
+            <label for="research-grade">年級 *</label>
+            <select id="research-grade" name="grade" required>
+              <option value="">請選擇</option>
+              ${['大一','大二','大三','大四','碩士班','博士班','其他'].map(v => `<option value="${v}" ${p.grade===v?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="research-gender">性別 *</label>
+            <select id="research-gender" name="gender" required>
+              <option value="">請選擇</option>
+              ${['男','女','其他','不願回答'].map(v => `<option value="${v}" ${p.gender===v?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="research-specialed">特殊教育導論修習狀況 *</label>
+            <select id="research-specialed" name="specialEd" required>
+              <option value="">請選擇</option>
+              ${['尚未修習','修習中','已修畢'].map(v => `<option value="${v}" ${p.specialEd===v?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="research-field">教育現場經驗 *</label>
+            <select id="research-field" name="fieldExperience" required>
+              <option value="">請選擇</option>
+              ${[
+                '無',
+                '曾入校觀課或參與教育現場觀察',
+                '曾擔任代理教師、代課教師或其他實際教學工作'
+              ].map(v => `<option value="${v}" ${p.fieldExperience===v?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      </form>`;
+
+    clearActions();
+    addButton('開始研究遊戲 →', 'primary', saveResearchFormAndStart);
+    addButton('← 返回研究說明', 'secondary', showResearchConsent);
+  }
+
+  function saveResearchFormAndStart() {
+    const form = document.getElementById('research-form');
+    if (!form || !form.reportValidity()) return;
+    const get = (id) => document.getElementById(id)?.value?.trim() || '';
+    state.research.profile = {
+      nickname: get('research-nickname'),
+      school: get('research-school'),
+      department: get('research-department'),
+      grade: get('research-grade'),
+      gender: get('research-gender'),
+      specialEd: get('research-specialed'),
+      fieldExperience: get('research-field')
+    };
+    resetRunState();
+    state.mode = 'research';
+    state.research.startTime = Date.now();
+    state.research.completionTime = 0;
+    state.research.restartCount = 0;
+    state.research.submitted = false;
+    state.research.declined = false;
+    setFooter('研究模式｜遊戲結束後由你決定是否提交資料');
+    showPrologue();
+  }
+
   function addTraits(delta) {
     Object.entries(delta || {}).forEach(([key, value]) => {
       state.traits[key] = (state.traits[key] || 0) + value;
@@ -507,6 +708,8 @@
 
   function showCover() {
     state.phase = 'cover';
+    state.mode = null;
+    setFooter('一般模式不送出研究資料');
     titleEl.textContent = '新手老師大作戰';
     timeEl.textContent = '報到日';
     setProgress(3, '準備報到');
@@ -533,10 +736,15 @@
       <div class="card-note center"><strong>今日任務</strong><br>走進五年二班，完成你的第一天。</div>
       <p class="center">你修過教育法規。你學過特殊教育。你知道什麼是融合教育。</p>
       <p class="center"><strong>但是今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>
+      <div class="mode-grid" aria-label="選擇遊戲模式">
+        <div class="mode-card"><strong>🎮 一般體驗模式</strong><span>適合課堂體驗、教師研習與個人反思；不會送出研究資料。</span></div>
+        <div class="mode-card"><strong>🎓 研究參與模式</strong><span>完成研究說明與基本資料後進入遊戲；遊戲結束後再由你決定是否提交研究資料。</span></div>
+      </div>
       <div class="author-note center small"><strong>遊戲設計與內容策劃</strong><br>國家教育研究院 黃彥融副研究員</div>`;
 
     clearActions();
-    addButton('開始我的第一天 →', 'primary', showPrologue);
+    addButton('🎮 一般體驗模式', 'primary', startGeneralMode);
+    addButton('🎓 研究參與模式', 'secondary', showResearchConsent);
     animateScreen();
   }
 
@@ -776,7 +984,7 @@
           <div class="ending-icon-bubble">${data.ending.icon}</div>
           <div class="school-badge">DAY 1 COMPLETE</div>
           <div class="scene-headline" style="max-width:none;margin-top:7px">${data.ending.title}</div>
-          <div class="scene-caption">黃老師，你今天看見了自己的教師樣貌</div>
+          <div class="scene-caption">${state.mode === 'research' && state.research.profile.nickname ? `${escapeHtml(state.research.profile.nickname)}，你今天看見了自己的教師樣貌` : '黃老師，你今天看見了自己的教師樣貌'}</div>
         </div>
       </div>`;
     animateScreen();
@@ -803,12 +1011,27 @@
         <label class="reflection-label" for="reflection-input">下一次遇到類似情境，我會……</label>
         <textarea id="reflection-input" class="reflection-input" maxlength="180" placeholder="寫下一句給未來自己的提醒（可留白）"></textarea>
       </div>
+      ${state.mode === 'research' ? `
+      <div class="research-note" id="research-submit-panel">
+        <div class="mode-badge">RESEARCH MODE</div>
+        <h3>願意分享你的學習歷程嗎？</h3>
+        <p>你已經先取得自己的教師成長紀錄。若你同意，系統會把本次遊戲選擇、背景資料、完成時間、重新挑戰次數、教師樣貌、五個雷達構面與反思文字送至研究資料表。</p>
+        <div id="research-submit-status" class="subtle">研究資料尚未提交。</div>
+      </div>` : ''}
       <div class="callout center"><strong>好的融合教師，不是永遠第一次就做出完美決定的人，<br>而是在學生的聲音出現後，願意重新理解、重新調整的人。</strong></div>`;
 
     clearActions();
     addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
-    addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
-    addButton('↻ 再挑戰五年二班的一天', 'secondary', restartGame);
+    if (state.mode === 'research') {
+      if (!state.research.submitted && !state.research.declined) {
+        addButton('🎓 同意提交本次研究資料', 'primary', sendResearchData);
+        addButton('不提交研究資料', 'secondary', declineResearchData);
+        addButton('↻ 再挑戰一次（尚未送出資料）', 'secondary', restartGame);
+      }
+    } else {
+      addButton('↻ 再挑戰五年二班的一天', 'secondary', restartGame);
+    }
+    addButton('看看今天其實遇到了什麼 →', 'secondary', showConcepts);
 
     const textarea = document.getElementById('reflection-input');
     textarea.value = state.reflection.text || '';
@@ -822,6 +1045,83 @@
         btn.classList.add('selected');
       });
     });
+  }
+
+  function researchPayload() {
+    const radar = computeRadar();
+    const profile = state.research.profile;
+    const answerLetter = (id) => {
+      const value = state.answers[id];
+      return Number.isInteger(value) ? String.fromCharCode(65 + value) : '';
+    };
+    state.research.completionTime = elapsedResearchSeconds();
+    return {
+      completionTime: state.research.completionTime,
+      restartCount: state.research.restartCount,
+      nickname: profile.nickname,
+      school: profile.school,
+      department: profile.department,
+      grade: profile.grade,
+      gender: profile.gender,
+      specialEd: profile.specialEd,
+      fieldExperience: profile.fieldExperience,
+      q1: answerLetter('q1'),
+      q2: answerLetter('q2'),
+      q3: answerLetter('q3'),
+      q4: answerLetter('q4'),
+      q5: answerLetter('q5'),
+      q6: answerLetter('q6'),
+      q7: answerLetter('q7'),
+      q8: answerLetter('q8'),
+      teacherType: getGrowthCardData().ending.title,
+      voice: radar.voice,
+      individual: radar.individual,
+      accommodation: radar.accommodation,
+      collaboration: radar.collaboration,
+      procedure: radar.procedure,
+      reflection: (state.reflection.text || '').trim()
+    };
+  }
+
+  function setResearchSubmitStatus(message, kind = '') {
+    const status = document.getElementById('research-submit-status');
+    if (!status) return;
+    status.className = `research-status ${kind}`.trim();
+    status.textContent = message;
+  }
+
+  async function sendResearchData() {
+    if (state.mode !== 'research' || state.research.submitted) return;
+    const payload = researchPayload();
+    setResearchSubmitStatus('正在送出研究資料……');
+    const buttons = Array.from(actionsEl.querySelectorAll('button'));
+    buttons.forEach(btn => { btn.disabled = true; });
+    try {
+      await fetch(RESEARCH_API, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload),
+        keepalive: true
+      });
+      state.research.submitted = true;
+      state.research.declined = false;
+      setResearchSubmitStatus('研究資料已送出。謝謝你分享這次的學習歷程。', 'success');
+      clearActions();
+      addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
+      addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
+    } catch (error) {
+      setResearchSubmitStatus('目前無法送出資料，請確認網路後再試一次。你的教師成長紀錄仍保留在本頁。', 'error');
+      buttons.forEach(btn => { btn.disabled = false; });
+    }
+  }
+
+  function declineResearchData() {
+    if (state.mode !== 'research' || state.research.submitted) return;
+    state.research.declined = true;
+    setResearchSubmitStatus('你已選擇不提交研究資料。你的教師成長紀錄仍然可以下載與保留。', 'declined');
+    clearActions();
+    addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
+    addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
   }
 
   function showConcepts() {
@@ -848,7 +1148,11 @@
       <p class="center subtle">接下來，跟著黃老師一起拆解這些情境背後的法規與權利概念。</p>`;
 
     clearActions();
-    addButton('↻ 重新挑戰國教院附小', 'primary', restartGame);
+    if (state.mode === 'research' && !state.research.submitted && !state.research.declined) {
+      addButton('🎓 回到成長紀錄並決定是否提交資料', 'primary', showGrowthRecord);
+    } else {
+      addButton('↻ 重新挑戰國教院附小', 'primary', restartGame);
+    }
   }
 
   function reflectionChoiceLabel() {
@@ -905,7 +1209,15 @@
     ctx.fillStyle = '#26312d';
     ctx.font = 'bold 52px sans-serif';
     ctx.fillText('我的教師成長紀錄', 120, y);
-    y += 74;
+    y += 54;
+    if (state.mode === 'research' && state.research.profile.nickname) {
+      ctx.fillStyle = '#68736d';
+      ctx.font = '26px sans-serif';
+      ctx.fillText(`暱稱：${state.research.profile.nickname}`, 120, y);
+      y += 54;
+    } else {
+      y += 20;
+    }
 
     ctx.fillStyle = '#315a50';
     ctx.font = 'bold 42px sans-serif';
@@ -969,12 +1281,26 @@
   }
 
   function restartGame() {
-    state.phase = 'cover';
-    state.step = 0;
-    state.answers = {};
-    state.traits = initialTraits();
-    state.reflection = { choice: '', text: '' };
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (state.mode === 'research' && !state.research.submitted && !state.research.declined) {
+      state.research.restartCount += 1;
+      resetRunState();
+      setFooter(`研究模式｜已重新挑戰 ${state.research.restartCount} 次｜資料尚未提交`);
+      showPrologue();
+      return;
+    }
+
+    resetRunState();
+    state.mode = null;
+    state.research = {
+      consented: false,
+      profile: emptyResearchProfile(),
+      startTime: null,
+      completionTime: 0,
+      restartCount: 0,
+      submitted: false,
+      declined: false
+    };
     showCover();
   }
 

@@ -1,17 +1,17 @@
-# 新手老師大作戰：融合校園的一天 — v5.0 GitHub Ready
+# 新手老師大作戰 v5.1 Research Mode
 
-這是可直接部署到 GitHub Pages 的完整版本。
+GitHub Pages 可部署版本。
 
-## 上傳方式
-將本資料夾內的所有內容上傳到 repository 根目錄：
-- index.html
-- style.css
-- game.js
-- assets/（整個資料夾）
+## 兩個入口
+- 一般體驗模式：不送出研究資料。
+- 研究參與模式：研究說明 → 知情同意 → 基本資料 → 八個情境 → 教師成長紀錄 → 自行決定是否提交研究資料。
 
-請勿只上傳三個程式檔；v5.0 的校園與情境插畫已改為實體 PNG 圖片，放在 assets/。
+## 研究模式送出欄位
+`completionTime`, `restartCount`, `nickname`, `school`, `department`, `grade`, `gender`, `specialEd`, `fieldExperience`, `q1`–`q8`, `teacherType`, `voice`, `individual`, `accommodation`, `collaboration`, `procedure`, `reflection`。
 
-## 圖片資源
-assets/ 內同時保留 PNG 與 SVG 原始圖。網頁實際使用 PNG；SVG 方便日後再編修或放大輸出。
+- Q1–Q8 以 A/B/C/D 儲存。
+- completionTime 以秒為單位，從第一次開始研究遊戲到按下提交資料為止；若提交前重新挑戰，時間持續累積。
+- restartCount 計算提交資料前的重新挑戰次數。
+- Apps Script endpoint 已接入 game.js。
 
-版本：v5.0 GitHub-ready
+> 正式研究前，研究說明與知情同意文字請以研究倫理審查核准版本為準。
