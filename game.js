@@ -636,6 +636,7 @@
       </div>`;
 
     clearActions();
+    addButton('📸 保存我的教師成長紀錄', 'secondary', saveGrowthCard);
     addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
     addButton('↻ 再過一次五年二班的一天', 'secondary', restartGame);
   }
@@ -664,6 +665,17 @@
 
     clearActions();
     addButton('↻ 重新挑戰國教院附小', 'primary', restartGame);
+  }
+
+
+  function saveGrowthCard() {
+    const ending = endingData[getEndingKey()];
+    const card = `我的教師成長紀錄\n\n新手老師大作戰：融合校園的一天\n\n我的教師樣貌：${ending.title}\n\n今天的提醒：\n好的融合教師，不是永遠第一次就做出完美決定的人，而是在學生的聲音出現後，願意重新理解、重新調整的人。\n\n設計與內容策劃：國家教育研究院 黃彥融副研究員`;
+    const w = window.open('', '_blank');
+    w.document.write('<html><head><title>我的教師成長紀錄</title></head><body style="font-family:sans-serif;white-space:pre-wrap;padding:40px;font-size:22px;line-height:1.8">'+card.replace(/</g,'&lt;')+'</body></html>');
+    w.document.close();
+    w.focus();
+    w.print();
   }
 
   function restartGame() {
