@@ -25,7 +25,8 @@
     phase: 'cover',
     step: 0,
     answers: {},
-    traits: initialTraits()
+    traits: initialTraits(),
+    reflection: { choice: '', text: '' }
   };
 
   const scenes = [
@@ -450,23 +451,22 @@
 
   function showCover() {
     state.phase = 'cover';
-    titleEl.textContent = '新手老師大作戰';
+    titleEl.textContent = '國教院附小';
     timeEl.textContent = '報到日';
     setProgress(3);
     sceneEl.className = 'scene';
     sceneEl.innerHTML = `
       <div class="scene-cover">
-        <div class="cover-label">國教院附小</div>
-        <div class="cover-card">
-          <div class="cover-icon">🏫</div>
-          <div class="cover-title">新手老師大作戰</div>
-          <div class="cover-subtitle">融合校園的一天</div>
-        </div>
+        <div class="cover-icon">🏫</div>
+        <div class="cover-school-name">歡迎來到國教院附小</div>
+        <div class="scene-caption">今天，是你到學校報到的第一天。</div>
       </div>`;
 
     storyEl.innerHTML = `
-      <div class="center">
-        <div class="subtle">一場關於融合教育、合理調整與學生參與的情境決策遊戲</div>
+      <div class="cover-heading center">
+        <h2 class="cover-main-title">新手老師大作戰</h2>
+        <div class="cover-main-subtitle">融合校園的一天</div>
+        <p class="subtle">一場關於融合教育、合理調整與學生參與的情境決策遊戲</p>
       </div>
       <div class="id-card center">
         <div class="subtle">國教院附小｜教師識別證</div>
@@ -476,7 +476,7 @@
       </div>
       <div class="card-note center"><strong>今日任務</strong><br>走進五年二班，完成你的第一天。</div>
       <p class="center">你修過教育法規。你學過特殊教育。你知道什麼是融合教育。</p>
-      <p class="center"><strong>但今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>
+      <p class="center"><strong>但是今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>
       <div class="author-note center small"><strong>遊戲設計與內容策劃</strong><br>國家教育研究院 黃彥融副研究員</div>`;
 
     clearActions();
@@ -601,6 +601,8 @@
     ].sort((a, b) => b[1] - a[1])[0];
 
     if (dominant[1] >= 5) return dominant[0];
+    // 「熱血投入型」主要由第八關的獨自承擔選擇觸發；solo 只有這一關加權，因此使用 3 作為門檻。
+    if (q8 === 0 && t.solo >= 3) return 'solo';
 
     const integrated = t.rights + t.individual + t.voice + t.accommodation + t.collaboration;
     if (integrated >= 16) return 'aware';
@@ -722,24 +724,36 @@
         <h3>📊 我的融合教育教師雷達</h3>
         ${radarRowsHtml(data.radar)}
       </div>
-      <div class="growth-card">
-        <h3>✨ 我的優勢</h3>
-        <p>${data.feedback.strength}</p>
-      </div>
-      <div class="growth-card">
-        <h3>🌱 我的下一步</h3>
-        <p>${data.feedback.next}</p>
-      </div>
-      <div class="growth-card">
+      <div class="rethink-card" id="rethink-card">
         <h3>💭 我的重新思考</h3>
-        <p>${data.rethink}</p>
+        <p>如果重新開始五年二班的一天，我最想重新思考哪一個決定？</p>
+        <div class="rethink-options">
+          <button type="button" class="rethink-choice" data-rethink="fairness"><strong>「老師，為什麼他可以？」</strong><span>公平與合理調整</span></button>
+          <button type="button" class="rethink-choice" data-rethink="participation"><strong>「我會怕，可是我還是想去。」</strong><span>安全與參與</span></button>
+          <button type="button" class="rethink-choice" data-rethink="voice"><strong>「可是你們沒有先問我。」</strong><span>學生表意</span></button>
+        </div>
+        <label class="reflection-label" for="reflection-input">下一次遇到類似情境，我會……</label>
+        <textarea id="reflection-input" class="reflection-input" maxlength="180" placeholder="寫下一句給未來自己的提醒（可留白）"></textarea>
       </div>
       <div class="callout center"><strong>好的融合教師，不是永遠第一次就做出完美決定的人，<br>而是在學生的聲音出現後，願意重新理解、重新調整的人。</strong></div>`;
 
     clearActions();
-    addButton('📸 保存我的教師成長紀錄', 'secondary', saveGrowthCard);
+    addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
     addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
     addButton('↻ 再挑戰五年二班的一天', 'secondary', restartGame);
+
+    const textarea = document.getElementById('reflection-input');
+    textarea.value = state.reflection.text || '';
+    textarea.addEventListener('input', () => { state.reflection.text = textarea.value; });
+
+    document.querySelectorAll('.rethink-choice').forEach(btn => {
+      if (btn.dataset.rethink === state.reflection.choice) btn.classList.add('selected');
+      btn.addEventListener('click', () => {
+        state.reflection.choice = btn.dataset.rethink;
+        document.querySelectorAll('.rethink-choice').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
   }
 
   function showConcepts() {
@@ -768,44 +782,121 @@
     addButton('↻ 重新挑戰國教院附小', 'primary', restartGame);
   }
 
-  function saveGrowthCard() {
+  function reflectionChoiceLabel() {
+    const labels = {
+      fairness: '「老師，為什麼他可以？」｜公平與合理調整',
+      participation: '「我會怕，可是我還是想去。」｜安全與參與',
+      voice: '「可是你們沒有先問我。」｜學生表意'
+    };
+    return labels[state.reflection.choice] || '尚未選擇';
+  }
+
+  function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 99) {
+    const chars = Array.from(text || '');
+    let line = '';
+    const lines = [];
+    for (const ch of chars) {
+      const test = line + ch;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = ch;
+        if (lines.length >= maxLines) break;
+      } else {
+        line = test;
+      }
+    }
+    if (line && lines.length < maxLines) lines.push(line);
+    lines.forEach((ln, i) => ctx.fillText(ln, x, y + i * lineHeight));
+    return y + lines.length * lineHeight;
+  }
+
+  function downloadGrowthCard() {
     const data = getGrowthCardData();
-    const radar = data.radar;
-    const rows = [
-      ['學生表意', radar.voice],
-      ['個別化思考', radar.individual],
-      ['合理調整', radar.accommodation],
-      ['專業合作', radar.collaboration],
-      ['法規程序', radar.procedure]
-    ].map(([label, val]) => `<div style="margin:6px 0"><strong>${label}</strong>：${stars(val)}</div>`).join('');
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1620;
+    const ctx = canvas.getContext('2d');
 
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>我的教師成長紀錄</title></head>
-      <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC','Microsoft JhengHei',sans-serif;background:#f6f3ec;padding:24px;line-height:1.75;color:#26312d;">
-        <div style="max-width:760px;margin:0 auto;background:#fffdf8;border:1px solid #d8d3c7;border-radius:18px;padding:28px;">
-          <div style="color:#68736d;font-size:14px;">新手老師大作戰：融合校園的一天</div>
-          <h1 style="margin:6px 0 12px;font-size:30px;">我的教師成長紀錄</h1>
-          <div style="background:#f0ede4;border-radius:14px;padding:16px;margin:14px 0;">
-            <div style="font-size:15px;color:#68736d;">我的教師樣貌</div>
-            <div style="font-size:28px;font-weight:900;margin:4px 0;">${data.ending.icon} ${data.ending.title}</div>
-            <div>${data.ending.body}</div>
-          </div>
-          <div style="background:#f7f5ee;border-radius:14px;padding:16px;margin:14px 0;">
-            <div style="font-weight:800;margin-bottom:8px;">📊 我的融合教育教師雷達</div>
-            ${rows}
-          </div>
-          <div style="margin:14px 0;"><strong>✨ 我的優勢</strong><br>${data.feedback.strength}</div>
-          <div style="margin:14px 0;"><strong>🌱 我的下一步</strong><br>${data.feedback.next}</div>
-          <div style="margin:14px 0;"><strong>💭 我的重新思考</strong><br>${data.rethink}</div>
-          <div style="margin-top:18px;padding:14px 16px;background:#dbe8e3;border-radius:14px;font-weight:700;">好的融合教師，不是永遠第一次就做出完美決定的人，而是在學生的聲音出現後，願意重新理解、重新調整的人。</div>
-          <div style="margin-top:18px;font-size:14px;color:#68736d;">遊戲設計與內容策劃：國家教育研究院 黃彥融副研究員</div>
-        </div>
-        <script>window.onload=()=>setTimeout(()=>window.print(),300);</script>
-      </body></html>`;
+    ctx.fillStyle = '#f6f3ec';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fffdf8';
+    ctx.beginPath();
+    ctx.roundRect(70, 60, 940, 1500, 28);
+    ctx.fill();
+    ctx.strokeStyle = '#d8d3c7';
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-    const w = window.open('', '_blank');
-    w.document.write(html);
-    w.document.close();
-    w.focus();
+    let y = 120;
+    ctx.fillStyle = '#68736d';
+    ctx.font = '28px sans-serif';
+    ctx.fillText('新手老師大作戰：融合校園的一天', 120, y);
+    y += 58;
+
+    ctx.fillStyle = '#26312d';
+    ctx.font = 'bold 52px sans-serif';
+    ctx.fillText('我的教師成長紀錄', 120, y);
+    y += 74;
+
+    ctx.fillStyle = '#315a50';
+    ctx.font = 'bold 42px sans-serif';
+    y = wrapCanvasText(ctx, `${data.ending.icon} ${data.ending.title}`, 120, y, 830, 54, 2) + 22;
+
+    ctx.fillStyle = '#26312d';
+    ctx.font = '30px sans-serif';
+    y = wrapCanvasText(ctx, data.ending.body, 120, y, 830, 44, 5) + 28;
+
+    ctx.fillStyle = '#315a50';
+    ctx.font = 'bold 32px sans-serif';
+    ctx.fillText('我的融合教育教師雷達', 120, y);
+    y += 52;
+
+    const radarItems = [
+      ['學生表意', data.radar.voice],
+      ['個別化思考', data.radar.individual],
+      ['合理調整', data.radar.accommodation],
+      ['專業合作', data.radar.collaboration],
+      ['法規程序', data.radar.procedure]
+    ];
+    ctx.font = '28px sans-serif';
+    for (const [label, val] of radarItems) {
+      ctx.fillStyle = '#26312d';
+      ctx.fillText(label, 120, y);
+      ctx.fillStyle = '#315a50';
+      ctx.fillText(stars(val), 430, y);
+      y += 43;
+    }
+    y += 18;
+
+    ctx.fillStyle = '#315a50';
+    ctx.font = 'bold 32px sans-serif';
+    ctx.fillText('我的重新思考', 120, y);
+    y += 48;
+
+    ctx.fillStyle = '#26312d';
+    ctx.font = '28px sans-serif';
+    y = wrapCanvasText(ctx, reflectionChoiceLabel(), 120, y, 830, 42, 3) + 18;
+    const reflection = (state.reflection.text || '').trim() || '下一次遇到類似情境，我會先停一下，聽聽學生怎麼想。';
+    y = wrapCanvasText(ctx, `我想提醒自己：${reflection}`, 120, y, 830, 42, 5) + 30;
+
+    ctx.fillStyle = '#dbe8e3';
+    ctx.beginPath();
+    ctx.roundRect(110, y, 860, 180, 18);
+    ctx.fill();
+    ctx.fillStyle = '#26312d';
+    ctx.font = 'bold 28px sans-serif';
+    wrapCanvasText(ctx, '好的融合教師，不是永遠第一次就做出完美決定的人，而是在學生的聲音出現後，願意重新理解、重新調整的人。', 140, y + 48, 800, 40, 4);
+
+    ctx.fillStyle = '#68736d';
+    ctx.font = '24px sans-serif';
+    ctx.fillText('遊戲設計與內容策劃｜國家教育研究院 黃彥融副研究員', 120, 1510);
+
+    const link = document.createElement('a');
+    link.download = '我的教師成長紀錄.png';
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   }
 
   function restartGame() {
@@ -813,6 +904,7 @@
     state.step = 0;
     state.answers = {};
     state.traits = initialTraits();
+    state.reflection = { choice: '', text: '' };
     window.scrollTo({ top: 0, behavior: 'smooth' });
     showCover();
   }
