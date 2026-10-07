@@ -45,13 +45,11 @@
     traits: initialTraits(),
     reflection: { choice: '', text: '' },
     research: {
-      consented: false,
       profile: emptyResearchProfile(),
       startTime: null,
       completionTime: 0,
       restartCount: 0,
-      submitted: false,
-      declined: false
+      submitted: false
     }
   };
 
@@ -468,63 +466,6 @@
     return Math.max(0, Math.floor((Date.now() - state.research.startTime) / 1000));
   }
 
-  function startGeneralMode() {
-    resetRunState();
-    state.mode = 'general';
-    state.research = {
-      consented: false,
-      profile: emptyResearchProfile(),
-      startTime: null,
-      completionTime: 0,
-      restartCount: 0,
-      submitted: false,
-      declined: false
-    };
-    setFooter('一般模式不送出研究資料');
-    showPrologue();
-  }
-
-  function showResearchConsent() {
-    state.phase = 'research-consent';
-    state.mode = 'research';
-    titleEl.textContent = '研究參與模式';
-    timeEl.textContent = '研究說明';
-    setProgress(4, '研究說明與知情同意');
-    updateDayTrack(-1, false);
-    renderSceneArt('classroom', '🎓', '融合教育情境決策研究');
-    setFooter('研究模式僅在你同意提交後送出資料');
-
-    storyEl.innerHTML = `
-      <div class="research-note">
-        <div class="mode-badge">RESEARCH MODE</div>
-        <h2>研究參與說明</h2>
-        <p>本研究旨在了解師資生如何在融合教育情境中進行專業判斷，以及參與者如何反思自己的教育決策。</p>
-        <ul class="research-list">
-          <li><strong>你會做什麼：</strong>填寫基本背景資料，完成八個融合教育情境，並可留下簡短反思。</li>
-          <li><strong>系統會記錄：</strong>情境選擇、完成時間、重新挑戰次數、教師樣貌與五個教師雷達構面。</li>
-          <li><strong>姓名：</strong>不要求真實姓名；請自行設定暱稱，並避免使用可直接識別你的真實姓名。</li>
-          <li><strong>參與方式：</strong>你可隨時停止；遊戲結束後仍會先取得自己的教師成長紀錄，再自行決定是否提交研究資料。</li>
-        </ul>
-      </div>
-      <label class="consent-check" for="research-consent-check">
-        <input type="checkbox" id="research-consent-check">
-        <span><strong>我已閱讀上述說明，並同意進入研究參與模式。</strong><br><span class="subtle">正式研究使用時，請以研究倫理審查核准之研究說明內容為準。</span></span>
-      </label>
-      <div id="research-consent-error" class="subtle" role="alert"></div>`;
-
-    clearActions();
-    addButton('繼續填寫基本資料 →', 'primary', () => {
-      const checked = document.getElementById('research-consent-check')?.checked;
-      if (!checked) {
-        const err = document.getElementById('research-consent-error');
-        if (err) err.textContent = '請先勾選同意後再繼續。';
-        return;
-      }
-      state.research.consented = true;
-      showResearchForm();
-    });
-    addButton('← 返回首頁', 'secondary', showCover);
-  }
 
   function showResearchForm() {
     state.phase = 'research-form';
@@ -593,7 +534,7 @@
 
     clearActions();
     addButton('開始研究遊戲 →', 'primary', saveResearchFormAndStart);
-    addButton('← 返回研究說明', 'secondary', showResearchConsent);
+    addButton('← 返回首頁', 'secondary', showCover);
   }
 
   function saveResearchFormAndStart() {
@@ -615,8 +556,7 @@
     state.research.completionTime = 0;
     state.research.restartCount = 0;
     state.research.submitted = false;
-    state.research.declined = false;
-    setFooter('研究模式｜遊戲結束後由你決定是否提交資料');
+    setFooter('研究參與版｜完成遊戲後提交本次研究資料');
     showPrologue();
   }
 
@@ -709,7 +649,7 @@
   function showCover() {
     state.phase = 'cover';
     state.mode = null;
-    setFooter('一般模式不送出研究資料');
+    setFooter('研究參與版｜本遊戲為既有研究參與流程之一部分');
     titleEl.textContent = '新手老師大作戰';
     timeEl.textContent = '報到日';
     setProgress(3, '準備報到');
@@ -736,15 +676,15 @@
       <div class="card-note center"><strong>今日任務</strong><br>走進五年二班，完成你的第一天。</div>
       <p class="center">你修過教育法規。你學過特殊教育。你知道什麼是融合教育。</p>
       <p class="center"><strong>但是今天，你不是來考法規。<br>你是五年二班的導師。</strong></p>
-      <div class="mode-grid" aria-label="選擇遊戲模式">
-        <div class="mode-card"><strong>🎮 一般體驗模式</strong><span>適合課堂體驗、教師研習與個人反思；不會送出研究資料。</span></div>
-        <div class="mode-card"><strong>🎓 研究參與模式</strong><span>完成研究說明與基本資料後進入遊戲；遊戲結束後再由你決定是否提交研究資料。</span></div>
+      <div class="research-note">
+        <div class="mode-badge">RESEARCH PARTICIPATION</div>
+        <h3>🎓 研究參與版</h3>
+        <p>本遊戲為既有研究參與流程的一部分。請先填寫基本資料，再進入八個融合教育情境；完成後請填寫「我的重新思考」，系統將送出本次研究紀錄。</p>
       </div>
       <div class="author-note center small"><strong>遊戲設計與內容策劃</strong><br>國家教育研究院 黃彥融副研究員</div>`;
 
     clearActions();
-    addButton('🎮 一般體驗模式', 'primary', startGeneralMode);
-    addButton('🎓 研究參與模式', 'secondary', showResearchConsent);
+    addButton('🎓 開始研究遊戲', 'primary', showResearchForm);
     animateScreen();
   }
 
@@ -1009,30 +949,26 @@
           <button type="button" class="rethink-choice" data-rethink="voice"><strong>「可是你們沒有先問我。」</strong><span>學生表意</span></button>
         </div>
         <label class="reflection-label" for="reflection-input">下一次遇到類似情境，我會……</label>
-        <textarea id="reflection-input" class="reflection-input" maxlength="500" placeholder="${state.mode === 'research' ? '請至少寫20字，例如：我會先詢問學生的想法，再思考如何提供支持……' : '寫下一句給未來自己的提醒'}"></textarea>
+        <textarea id="reflection-input" class="reflection-input" maxlength="500" placeholder="請至少寫20字，例如：我會先詢問學生的想法，再思考如何提供支持……"></textarea>
         <div id="reflection-count" class="reflection-count" aria-live="polite"></div>
       </div>
       ${state.mode === 'research' ? `
       <div class="research-note" id="research-submit-panel">
         <div class="mode-badge">RESEARCH MODE</div>
-        <h3>願意分享你的學習歷程嗎？</h3>
-        <p>你已經先取得自己的教師成長紀錄。若你同意，系統會把本次遊戲選擇、背景資料、完成時間、重新挑戰次數、教師樣貌、五個雷達構面與反思文字送至研究資料表。研究資料提交前，請完成至少 20 字、最多 500 字的「我的重新思考」。</p>
-        <div id="research-submit-status" class="subtle">研究資料尚未提交。</div>
+        <h3>完成本次研究紀錄</h3>
+        <p>請完成至少 20 字、最多 500 字的「我的重新思考」。按下「完成並提交研究資料」後，系統會將本次情境選擇、背景資料、完成時間、重新挑戰次數、教師樣貌、五個雷達構面與反思文字送至研究資料表。</p>
+        <div id="research-submit-status" class="subtle">請完成反思後提交本次研究資料。</div>
       </div>` : ''}
       <div class="callout center"><strong>好的融合教師，不是永遠第一次就做出完美決定的人，<br>而是在學生的聲音出現後，願意重新理解、重新調整的人。</strong></div>`;
 
     clearActions();
     addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
-    if (state.mode === 'research') {
-      if (!state.research.submitted && !state.research.declined) {
-        addButton('🎓 同意提交本次研究資料', 'primary', sendResearchData);
-        addButton('不提交研究資料', 'secondary', declineResearchData);
-        addButton('↻ 再挑戰一次（尚未送出資料）', 'secondary', restartGame);
-      }
+    if (state.mode === 'research' && !state.research.submitted) {
+      addButton('🎓 完成並提交研究資料', 'primary', sendResearchData);
+      addButton('↻ 再挑戰一次（尚未提交）', 'secondary', restartGame);
     } else {
-      addButton('↻ 再挑戰五年二班的一天', 'secondary', restartGame);
+      addButton('看看今天其實遇到了什麼 →', 'secondary', showConcepts);
     }
-    addButton('看看今天其實遇到了什麼 →', 'secondary', showConcepts);
 
     const textarea = document.getElementById('reflection-input');
     const reflectionCount = document.getElementById('reflection-count');
@@ -1041,14 +977,9 @@
     const updateReflectionCount = () => {
       const length = textarea.value.trim().length;
       if (!reflectionCount) return;
-      if (state.mode === 'research') {
-        reflectionCount.textContent = `目前字數：${length} / 500（至少 20 字）`;
-        reflectionCount.classList.toggle('is-valid', length >= 20 && length <= 500);
-        reflectionCount.classList.toggle('is-invalid', length < 20);
-      } else {
-        reflectionCount.textContent = `目前字數：${length} / 500`;
-        reflectionCount.classList.remove('is-valid', 'is-invalid');
-      }
+      reflectionCount.textContent = `目前字數：${length} / 500（至少 20 字）`;
+      reflectionCount.classList.toggle('is-valid', length >= 20 && length <= 500);
+      reflectionCount.classList.toggle('is-invalid', length < 20);
     };
 
     textarea.addEventListener('input', () => {
@@ -1143,8 +1074,7 @@
         keepalive: true
       });
       state.research.submitted = true;
-      state.research.declined = false;
-      setResearchSubmitStatus('研究資料已送出。謝謝你分享這次的學習歷程。', 'success');
+      setResearchSubmitStatus('研究資料已送出。謝謝你完成本次研究活動。', 'success');
       clearActions();
       addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
       addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
@@ -1152,15 +1082,6 @@
       setResearchSubmitStatus('目前無法送出資料，請確認網路後再試一次。你的教師成長紀錄仍保留在本頁。', 'error');
       buttons.forEach(btn => { btn.disabled = false; });
     }
-  }
-
-  function declineResearchData() {
-    if (state.mode !== 'research' || state.research.submitted) return;
-    state.research.declined = true;
-    setResearchSubmitStatus('你已選擇不提交研究資料。你的教師成長紀錄仍然可以下載與保留。', 'declined');
-    clearActions();
-    addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
-    addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
   }
 
   function showConcepts() {
@@ -1187,8 +1108,8 @@
       <p class="center subtle">接下來，跟著黃老師一起拆解這些情境背後的法規與權利概念。</p>`;
 
     clearActions();
-    if (state.mode === 'research' && !state.research.submitted && !state.research.declined) {
-      addButton('🎓 回到成長紀錄並決定是否提交資料', 'primary', showGrowthRecord);
+    if (state.mode === 'research' && !state.research.submitted) {
+      addButton('🎓 回到成長紀錄並完成研究資料', 'primary', showGrowthRecord);
     } else {
       addButton('↻ 重新挑戰國教院附小', 'primary', restartGame);
     }
@@ -1321,10 +1242,10 @@
 
   function restartGame() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (state.mode === 'research' && !state.research.submitted && !state.research.declined) {
+    if (state.mode === 'research' && !state.research.submitted) {
       state.research.restartCount += 1;
       resetRunState();
-      setFooter(`研究模式｜已重新挑戰 ${state.research.restartCount} 次｜資料尚未提交`);
+      setFooter(`研究參與版｜已重新挑戰 ${state.research.restartCount} 次｜完成後請提交研究資料`);
       showPrologue();
       return;
     }
@@ -1332,13 +1253,11 @@
     resetRunState();
     state.mode = null;
     state.research = {
-      consented: false,
       profile: emptyResearchProfile(),
       startTime: null,
       completionTime: 0,
       restartCount: 0,
-      submitted: false,
-      declined: false
+      submitted: false
     };
     showCover();
   }
