@@ -768,31 +768,10 @@
 
     clearActions();
     const isLast = state.step === scenes.length - 1;
-    addButton(isLast ? '走出校門 →' : '繼續今天的行程 →', 'primary', () => {
-      if (isLast) showDayComplete();
+    addButton(isLast ? '完成最後一個情境 →' : '繼續今天的行程 →', 'primary', () => {
+      if (isLast) showReflectionStep();
       else showScene(state.step + 1);
     });
-  }
-
-  function showDayComplete() {
-    state.phase = 'complete';
-    titleEl.textContent = 'DAY 1 COMPLETE';
-    timeEl.textContent = '17:02';
-    setProgress(100, 'DAY 1 COMPLETE');
-    updateDayTrack(8, true);
-    renderSceneArt('sunset', '🏫🌇', '第一天，完成');
-    storyEl.innerHTML = `
-      <p>你終於收好東西，走出五年二班。</p>
-      <p>經過校門時，警衛伯伯抬頭：</p>
-      <div class="quote">「黃老師，第一天還順利嗎？」</div>
-      <p>你想了一下。</p>
-      <p>「……學到很多。」</p>
-      <p>警衛伯伯點點頭。</p>
-      <div class="callout center"><strong>「明天還要來喔。」</strong></div>
-      <p class="center"><strong>今天，你做了八個決定。<br>這些決定，也慢慢形成了你的教師樣貌……</strong></p>`;
-
-    clearActions();
-    addButton('寫下我的重新思考 →', 'primary', showReflectionStep);
   }
 
   function getEndingKey() {
