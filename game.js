@@ -556,7 +556,7 @@
     state.research.completionTime = 0;
     state.research.restartCount = 0;
     state.research.submitted = false;
-    setFooter('研究參與版｜完成遊戲後提交本次研究資料');
+    setFooter('研究參與版｜完成八個情境與最後反思');
     showPrologue();
   }
 
@@ -792,7 +792,7 @@
       <p class="center"><strong>今天，你做了八個決定。<br>這些決定，也慢慢形成了你的教師樣貌……</strong></p>`;
 
     clearActions();
-    addButton('查看我的教師成長紀錄 →', 'primary', showGrowthRecord);
+    addButton('寫下我的重新思考 →', 'primary', showReflectionStep);
   }
 
   function getEndingKey() {
@@ -910,9 +910,64 @@
     };
   }
 
+  function showReflectionStep() {
+    state.phase = 'reflection';
+    titleEl.textContent = '最後一步｜我的重新思考';
+    timeEl.textContent = '17:05';
+    setProgress(96, '最後一步・重新思考');
+    updateDayTrack(8, true);
+    renderSceneArt('talk', '💭', '在看見結果之前，先留下你的想法');
+
+    storyEl.innerHTML = `
+      <div class="rethink-card" id="rethink-card">
+        <h2>💭 我的重新思考</h2>
+        <p>回顧今天的八個情境，如果再次遇到類似情況，你會如何調整自己的教師決定？</p>
+        <div class="rethink-options">
+          <button type="button" class="rethink-choice" data-rethink="fairness"><strong>「老師，為什麼他可以？」</strong><span>公平與合理調整</span></button>
+          <button type="button" class="rethink-choice" data-rethink="participation"><strong>「我會怕，可是我還是想去。」</strong><span>安全與參與</span></button>
+          <button type="button" class="rethink-choice" data-rethink="voice"><strong>「可是你們沒有先問我。」</strong><span>學生表意</span></button>
+        </div>
+        <label class="reflection-label" for="reflection-input">下一次遇到類似情境，我會……</label>
+        <textarea id="reflection-input" class="reflection-input" maxlength="500" placeholder="請至少寫10字，例如：我會先詢問學生的想法，再思考如何提供支持……"></textarea>
+        <div id="reflection-count" class="reflection-count" aria-live="polite"></div>
+        <div id="research-submit-status" class="subtle" aria-live="polite"></div>
+      </div>`;
+
+    clearActions();
+    addButton('✨ 完成遊戲，查看我的教師樣貌', 'primary', finishResearchAndShowGrowthRecord);
+
+    const textarea = document.getElementById('reflection-input');
+    const reflectionCount = document.getElementById('reflection-count');
+    textarea.value = state.reflection.text || '';
+
+    const updateReflectionCount = () => {
+      const length = textarea.value.trim().length;
+      if (!reflectionCount) return;
+      reflectionCount.textContent = `目前字數：${length} / 500（至少 10 字）`;
+      reflectionCount.classList.toggle('is-valid', length >= 10 && length <= 500);
+      reflectionCount.classList.toggle('is-invalid', length < 10);
+    };
+
+    textarea.addEventListener('input', () => {
+      state.reflection.text = textarea.value;
+      updateReflectionCount();
+    });
+    updateReflectionCount();
+
+    document.querySelectorAll('.rethink-choice').forEach(btn => {
+      if (btn.dataset.rethink === state.reflection.choice) btn.classList.add('selected');
+      btn.addEventListener('click', () => {
+        state.reflection.choice = btn.dataset.rethink;
+        document.querySelectorAll('.rethink-choice').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+  }
+
   function showGrowthRecord() {
     state.phase = 'growth';
     const data = getGrowthCardData();
+    const reflectionText = (state.reflection.text || '').trim();
     titleEl.textContent = '我的教師成長紀錄';
     timeEl.textContent = 'DAY 1 COMPLETE';
     setProgress(100, '教師成長紀錄');
@@ -940,62 +995,16 @@
         <h3>📊 我的融合教育教師雷達</h3>
         ${radarRowsHtml(data.radar)}
       </div>
-      <div class="rethink-card" id="rethink-card">
-        <h3>💭 我的重新思考</h3>
-        <p>如果重新開始五年二班的一天，我最想重新思考哪一個決定？</p>
-        <div class="rethink-options">
-          <button type="button" class="rethink-choice" data-rethink="fairness"><strong>「老師，為什麼他可以？」</strong><span>公平與合理調整</span></button>
-          <button type="button" class="rethink-choice" data-rethink="participation"><strong>「我會怕，可是我還是想去。」</strong><span>安全與參與</span></button>
-          <button type="button" class="rethink-choice" data-rethink="voice"><strong>「可是你們沒有先問我。」</strong><span>學生表意</span></button>
-        </div>
-        <label class="reflection-label" for="reflection-input">下一次遇到類似情境，我會……</label>
-        <textarea id="reflection-input" class="reflection-input" maxlength="500" placeholder="請至少寫20字，例如：我會先詢問學生的想法，再思考如何提供支持……"></textarea>
-        <div id="reflection-count" class="reflection-count" aria-live="polite"></div>
+      <div class="rethink-card">
+        <h3>💭 我剛才的重新思考</h3>
+        ${state.reflection.choice ? `<div class="subtle">${escapeHtml(reflectionChoiceLabel())}</div>` : ''}
+        <p>${escapeHtml(reflectionText).replace(/\n/g, '<br>')}</p>
       </div>
-      ${state.mode === 'research' ? `
-      <div class="research-note" id="research-submit-panel">
-        <div class="mode-badge">RESEARCH MODE</div>
-        <h3>完成本次研究紀錄</h3>
-        <p>請完成至少 20 字、最多 500 字的「我的重新思考」。按下「完成並提交研究資料」後，系統會將本次情境選擇、背景資料、完成時間、重新挑戰次數、教師樣貌、五個雷達構面與反思文字送至研究資料表。</p>
-        <div id="research-submit-status" class="subtle">請完成反思後提交本次研究資料。</div>
-      </div>` : ''}
       <div class="callout center"><strong>好的融合教師，不是永遠第一次就做出完美決定的人，<br>而是在學生的聲音出現後，願意重新理解、重新調整的人。</strong></div>`;
 
     clearActions();
     addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
-    if (state.mode === 'research' && !state.research.submitted) {
-      addButton('🎓 完成並提交研究資料', 'primary', sendResearchData);
-      addButton('↻ 再挑戰一次（尚未提交）', 'secondary', restartGame);
-    } else {
-      addButton('看看今天其實遇到了什麼 →', 'secondary', showConcepts);
-    }
-
-    const textarea = document.getElementById('reflection-input');
-    const reflectionCount = document.getElementById('reflection-count');
-    textarea.value = state.reflection.text || '';
-
-    const updateReflectionCount = () => {
-      const length = textarea.value.trim().length;
-      if (!reflectionCount) return;
-      reflectionCount.textContent = `目前字數：${length} / 500（至少 20 字）`;
-      reflectionCount.classList.toggle('is-valid', length >= 20 && length <= 500);
-      reflectionCount.classList.toggle('is-invalid', length < 20);
-    };
-
-    textarea.addEventListener('input', () => {
-      state.reflection.text = textarea.value;
-      updateReflectionCount();
-    });
-    updateReflectionCount();
-
-    document.querySelectorAll('.rethink-choice').forEach(btn => {
-      if (btn.dataset.rethink === state.reflection.choice) btn.classList.add('selected');
-      btn.addEventListener('click', () => {
-        state.reflection.choice = btn.dataset.rethink;
-        document.querySelectorAll('.rethink-choice').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-      });
-    });
+    addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
   }
 
   function researchPayload() {
@@ -1044,8 +1053,8 @@
   function validateResearchReflection() {
     const textarea = document.getElementById('reflection-input');
     const text = (state.reflection.text || '').trim();
-    if (text.length < 20) {
-      setResearchSubmitStatus(`請先完成「我的重新思考」，至少需要 20 字（目前 ${text.length} 字）。`, 'error');
+    if (text.length < 10) {
+      setResearchSubmitStatus(`請先完成「我的重新思考」，至少需要 10 字（目前 ${text.length} 字）。`, 'error');
       textarea?.focus();
       textarea?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return false;
@@ -1059,11 +1068,11 @@
     return true;
   }
 
-  async function sendResearchData() {
+  async function finishResearchAndShowGrowthRecord() {
     if (state.mode !== 'research' || state.research.submitted) return;
     if (!validateResearchReflection()) return;
     const payload = researchPayload();
-    setResearchSubmitStatus('正在送出研究資料……');
+    setResearchSubmitStatus('正在整理你的教師成長紀錄……');
     const buttons = Array.from(actionsEl.querySelectorAll('button'));
     buttons.forEach(btn => { btn.disabled = true; });
     try {
@@ -1074,12 +1083,10 @@
         keepalive: true
       });
       state.research.submitted = true;
-      setResearchSubmitStatus('研究資料已送出。謝謝你完成本次研究活動。', 'success');
-      clearActions();
-      addButton('📸 下載我的教師成長卡（PNG）', 'secondary', downloadGrowthCard);
-      addButton('看看今天其實遇到了什麼 →', 'primary', showConcepts);
+      showGrowthRecord();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
-      setResearchSubmitStatus('目前無法送出資料，請確認網路後再試一次。你的教師成長紀錄仍保留在本頁。', 'error');
+      setResearchSubmitStatus('目前無法完成，請確認網路後再試一次。', 'error');
       buttons.forEach(btn => { btn.disabled = false; });
     }
   }
@@ -1109,7 +1116,7 @@
 
     clearActions();
     if (state.mode === 'research' && !state.research.submitted) {
-      addButton('🎓 回到成長紀錄並完成研究資料', 'primary', showGrowthRecord);
+      addButton('← 回到最後一步', 'primary', showReflectionStep);
     } else {
       addButton('↻ 重新挑戰國教院附小', 'primary', restartGame);
     }
@@ -1245,7 +1252,7 @@
     if (state.mode === 'research' && !state.research.submitted) {
       state.research.restartCount += 1;
       resetRunState();
-      setFooter(`研究參與版｜已重新挑戰 ${state.research.restartCount} 次｜完成後請提交研究資料`);
+      setFooter(`研究參與版｜已重新挑戰 ${state.research.restartCount} 次`);
       showPrologue();
       return;
     }
